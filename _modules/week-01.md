@@ -7,7 +7,7 @@ January 10
   : [Slides](#), [Class activity](#)
 
 : Install R and RStudio 
-  : [R and RStudio setup](https://sta279.github.io/s22/software_installation/)
+  : [R and RStudio setup](https://sta279-s22.github.io/software_installation/)
   
 : [ggplot2 cheat sheet](https://raw.githubusercontent.com/rstudio/cheatsheets/master/data-visualization.pdf)
 
