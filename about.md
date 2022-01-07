@@ -20,7 +20,7 @@ description: >-
 
 ## Overview
 
-Welcome to STA 112! The purpose of this course is to introduce you to statistical modeling and data science. By the end of this course, you will be able to clean, transform, and visualize data, fit and interpret statistical models, and communicate the results of your data analyses. Throughout the semester you will work with real data from a variety of sources, and we will emphasize reproducibility, checking assumptions, and thoughtful data analysis.
+Welcome to STA 279! The purpose of this course is to introduce you to statistical modeling and data science. By the end of this course, you will be able to clean, transform, and visualize data, fit and interpret statistical models, and communicate the results of your data analyses. Throughout the semester you will work with real data from a variety of sources, and we will emphasize reproducibility, checking assumptions, and thoughtful data analysis.
 
 **Section A:** MWF 1:00 -- 1:50
 
