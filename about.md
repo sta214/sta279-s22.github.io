@@ -20,9 +20,9 @@ description: >-
 
 ## Overview
 
-Welcome to STA 279! The purpose of this course is to introduce you to statistical modeling and data science. By the end of this course, you will be able to clean, transform, and visualize data, fit and interpret statistical models, and communicate the results of your data analyses. Throughout the semester you will work with real data from a variety of sources, and we will emphasize reproducibility, checking assumptions, and thoughtful data analysis.
+Welcome to STA 279! This course covers *generalized linear models* (GLMs), which generalize the regression models we learned in 112 to other types of response variables. We will cover logistic regression, multinomial regression, and Poisson regression. We will also discuss random effects, which allow us to handle patterns of dependence in our data, and bootstrapping, which allows us to do inference with weaker assumptions. Throughout the semester you will work with real data from a variety of sources, and we will emphasize reproducibility, checking assumptions, and thoughtful data analysis.
 
-**Section A:** MWF 1:00 -- 1:50
+*Time:** MWF 2:00 -- 2:50
 
 **Professor:** Ciaran Evans
 
@@ -34,7 +34,7 @@ Welcome to STA 279! The purpose of this course is to introduce you to statistica
 
 **Laptops:** You will need a laptop for this class, and must bring it every day.
 
-**Textbook:** [STAT2](https://www.amazon.com/STAT2-Modeling-Regression-Ann-Cannon/dp/1319054072): Modeling with Regression and ANOVA (2nd edition), Cannon et al.
+**Textbook:** [Beyond MLR](https://bookdown.org/roback/bookdown-BeyondMLR/): Beyond Multiple Linear Regression, Roback and Legler. The textbook is available, *free*, at the link provided.
 
 **Software:** We will be using the statistical software [R](https://cran.r-project.org/), through the interface [RStudio](https://www.rstudio.com/products/rstudio/download/) for working with data and statistical modeling. You will need to download R and RStudio onto your laptop; instruction will be provided on the course website.
 
@@ -59,7 +59,7 @@ Resources for R:
 
 ## Getting help
 
-If you have any questions about the course (or statistics in general!), please don't hesitate to ask! I am available during office hours, by appointment, or via email. If you're emailing about an issue with R, please include a minimum working example (everything I need to reproduce the issue you encountered). There will also be tutoring at the [Math and Stats Center](http://mathandstatscenter.wfu.edu/student-information/).
+If you have any questions about the course (or statistics in general!), please don't hesitate to ask! I am available during office hours, by appointment, or via email. If you're emailing about an issue with R, please include a minimum working example (everything I need to reproduce the issue you encountered). 
 
 Keep in mind that debugging software issues can take time, so make sure to start the assignments early in case you run into problems.
 
@@ -89,7 +89,7 @@ Attendance is important, and you are expected to participate actively in class a
 
 ### Extensions
 
-You have a bank of **5** extension days, which you may use over the course of the semester. You may use either 1 or 2 extension days for a give homework assignment or project (making the assignment due either 24 or 48 hours after the original due date). If you plan to use an extension, you must email me before the assignment is due.
+You have a bank of **5** extension days, which you may use over the course of the semester. You may use either 1 or 2 extension days for a give homework, lab, or project (making the assignment due either 24 or 48 hours after the original due date). If you plan to use an extension, you must email me before the assignment is due.
 
 Extensions in extenuating circumstances, such as family emergencies, will be handled separately and on an individual basis.
 
@@ -140,19 +140,14 @@ If you have a specific need to have a phone during a class period, please contac
 
 ## Course components
 
-### Class activities and labs
+### Class activities, labs, and homework
 
 This course includes regular, short activities during class time to help your learning. We will also periodically have lab days, in which we spend most of the class on an extended activity that gives you the opportunity to work with data and practice the material learned in lecture. During lab, you will use the statistical software RStudio (a user-friendly front end for R) to manipulate and visualize data, fit statistical models, and report your results.
 
-There will be approximately 7 lab days during the semester, with more at the beginning as we get familiar with R and data analysis. Participation in both class activities and labs is expected, but you do not need to submit your work. I will post solutions on Canvas after class.
+There will be approximately 6-8 lab days during the semester. Participation in both class activities and labs is expected. Labs will be part of your course grade, but class activities will not be graded. Labs will be created with [R Markdown](https://rmarkdown.rstudio.com/), which improves reproducibility, and will be submitted on Canvas.
 
-### Homework
-
-Homework assignments provide the opportunity for more extended and in-depth practice with the material we learn in class, and they will help prepare you for the projects and exams. There will be approximately 7 -- 9 homework assignments during the semester. The documents you submit will be files created with [R Markdown](https://rmarkdown.rstudio.com/), which improves reproducibility. We will cover R Markdown in class and lab.
-
-You are welcomed, and encouraged, to work with each other on the problems, but you must turn in
-your own work. If you copy someone else’s work, both parties may receive a 0 for the homework grade.
-If you work with someone else on the homework, you must write the name of your collaborator(s) on
+Homework assignments provide the opportunity for additional practice with the material we learn in class, and they will help prepare you for the projects and exams. You are welcomed, and encouraged, to work with each other on homework assignments and labs, but you must turn in
+your own work. If you copy someone else’s work, both parties may receive a 0 for the assignment grade. If you work with someone else, you must write the name of your collaborator(s) on
 your homework.
 
 Submission instructions and due dates will be provided on each assignment. Grading will be based on both completeness and accuracy. 
@@ -162,28 +157,27 @@ Submission instructions and due dates will be provided on each assignment. Gradi
 
 Statistics and data science in the real world often involves in-depth analysis of complex datasets to answer one or more high-level research questions, and communicating these results to a wider audience. Projects provide an opportunity to develop these skills, and apply the tools you have learned in class and practiced in labs and problem sets.
 
-There will be two projects in this course. You will be provided with a dataset, and asked to answer one or more research questions with data visualizations and statistical models. You will submit a written report describing your analysis and conclusions. The first project will include additional, smaller deliverables (such as a data analysis plan) before the final report is due.
+There will be two projects in this course. You will be provided with a dataset, and asked to answer one or more research questions with data visualizations and statistical models. You will submit a written report describing your analysis and conclusions.
 
 Further instructions and grading rubrics will be provided with each project.
 
 ### Exams
 
-We will have two in-class exams, covering simple linear regression and multiple linear regression. Tentative dates (subject to change) can be found on the course calendar.
+We will have two in-class exams. Tentative dates (subject to change) can be found on the course calendar.
 
-There is no final exam in this course. The second project will be due (electronically) during final exam week.
+We will also have a final exam. The scheduled final exam time for this course is **Saturday, April 30** at 2pm.
 
 
 ## Grading
 
 | Component | Weight |
 | --------- | ------ |
-| Homework  |  30%   |
+| Homework and Labs |  30%   |
 | Exam 1    |  10%   |
 | Exam 2    |  10%   |
-| Project 1 |  35%   |
+| Final Exam | 20% |
+| Project 1 |  15%   |
 | Project 2 |  15%   |
-
-Occasionally, optional extra credit assignments may be posted. These will involve learning material beyond what we cover in the course, and are expected to take a significant amount of time.
 
 I will use the standard grading scale (above a 93 is an A, above a 90 is an A-, above an 87 is a B+, etc.)
 
