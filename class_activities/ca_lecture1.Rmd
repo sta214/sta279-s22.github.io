@@ -47,7 +47,11 @@ I say *empirical* probability here because we are estimating it from the observe
 
 # Part II
 
-So far, we've seen probabilities, $\pi$, and odds, $\dfrac{\pi}{1 - \pi}$. Another way of looking at a categorical response is with the *log odds*, $\log \left( \dfrac{\pi}{1 - \pi} \right)$.
+So far, we've seen probabilities, $\pi$, and odds, $\dfrac{\pi}{1 - \pi}$. Another way of looking at a binary response is with the *log odds*, $\log \left( \dfrac{\pi}{1 - \pi} \right)$. Indeed, a logistic regression model for the relationship between age and contraceptive use would look like
+
+$\log \left( \dfrac{\pi}{1 - \pi} \right) = \beta_0 + \beta_1 \text{Age}$
+
+In these questions, we will start to think about the log odds.
 
 4. What range of values can the log odds take?
 
