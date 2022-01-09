@@ -1,0 +1,452 @@
+---
+author: "Dr. Ciaran Evans"
+title: Welcome to STA 279
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+## Welcome!
+
+.center[
+<img src="environmental-data-science-r4ds-general.png" alt="drawing" width="500"/>
+]
+
+- Dr. Ciaran Evans (he/him)
+- Manchester 329
+- Course website: [https://sta279-s22.github.io/](https://sta279-s22.github.io/)
+
+.footnote[
+Illustration: Updated from Grolemund & Wickham's classic R4DS schematic, envisioned by Dr. Julia Lowndes for her 2019 useR! keynote talk and illustrated by Allison Horst.
+]
+
+---
+
+## Agenda
+
+* Warm-up activity: intro to logistic regression
+* Plan for week 1 and the semester
+* Syllabus highlights
+
+---
+
+# Data
+
+Using information from the National Indonesia Contraceptive Prevalence Survey, we are interested in studying the relationship between an individual's age and whether or not they use contraceptives.
+
+.footnote[
+The data come from [http://archive.ics.uci.edu/ml/datasets/Contraceptive+Method+Choice](http://archive.ics.uci.edu/ml/datasets/Contraceptive+Method+Choice)
+]
+
+--
+
+**Question:** Statistical models are typically used for one of three main goals: *association/inference* (understanding how variables are associated), *prediction* (predicting one variable from another), and *causal inference* (determining whether one variable causes another). What is our goal with the contraceptive data?
+
+.abox[ 
+Association/Inference
+]
+
+.bbox[
+Prediction
+]
+
+.cbox[
+Causal inference
+]
+
+--
+
+**Answer:** We care about the relationship between age and contraceptive use, but we don't aim to draw causal conclusions, so our goal is *association/inference*
+
+---
+
+## Data
+
+Information on 911 husband-wife couples, with wife aged between 20 and 35, and variables including:
+
+* Contraceptive method used (0 = none, 1 = some use)
+* Wife's age (in years)
+* Husband's age (in years)
+* Wife's education (1 = low, 2, 3, 4 = high)
+* Husband's education (1 = low, 2, 3, 4 = high)
+* Number of children ever born
+
+---
+
+## Data
+
+**Research question:** What is the relationship between wife's age and the use of contraceptives?
+
+**Response variable:** Contraceptive use (0 = no, 1 = yes)
+
+**Explanatory variable:** Wife's age (in years)
+
+---
+
+## Exploratory data analysis (EDA)
+
+What plot can we use to visualize the response (contraceptive use)?
+
+.abox[ 
+Boxplot
+]
+
+.bbox[
+Histogram
+]
+
+.cbox[
+Bar chart
+]
+
+.dbox[
+Scatterplot
+]
+
+--
+
+**Answer:** Bar chart
+
+```{r echo=F, message=F, warning=F, fig.align='center', fig.width=6, fig.height=3}
+library(tidyverse)
+cmc_data <- read_csv("cmc.data.txt", col_names = F)
+colnames(cmc_data) <-c("WifeAge", "WifeEdu", "HusbandEdu", "NumChild", "WifeRel", "WifeWork", "HusbandOcc","Living", "Media", "Choice")
+cmc_data$Choice <- ifelse( cmc_data$Choice == 1, "None", ifelse(cmc_data$Choice==2, "Short", "Long"))
+cmc_data$ChoiceBin <- ifelse(cmc_data$Choice =="None", 0 , 1)
+cmc_data <- cmc_data %>% 
+  filter(WifeAge >= 20, WifeAge <= 35)
+
+cmc_data %>%
+  ggplot(aes(x = as.factor(ChoiceBin))) +
+  geom_bar() +
+  labs(x = "Contraceptive use?") +
+  theme_bw() +
+  theme(text = element_text(size=20))
+```
+
+---
+
+## Exploratory data analysis (EDA)
+
+What plot can we use to visualize the explanatory variable (wife's age)?
+
+.abox[ 
+Boxplot
+]
+
+.bbox[
+Histogram
+]
+
+.cbox[
+Bar chart
+]
+
+.dbox[
+Scatterplot
+]
+
+--
+
+**Answer:** Histogram (or boxplot)
+
+```{r echo=F, message=F, warning=F, fig.align='center', fig.width=6, fig.height=3}
+
+cmc_data %>%
+  ggplot(aes(x = WifeAge)) +
+  geom_histogram(bins = 8) +
+  labs(x = "Wife's age (years)") +
+  theme_bw() +
+  theme(text = element_text(size=20))
+```
+
+---
+
+## Class activity, Part I
+
+In the class activity, you'll start to explore the relationship between age and contraceptive use.
+
+Spend a few minutes to do the following:
+
+* Say hi to the people around you, introduce yourself
+* Work in groups on Part I of the class activity (questions 1 -- 3)
+
+---
+
+## Class activity
+
+What is the (empirical) probability of contraceptive use?
+
+$P(\text{Contraceptive use} = 1) =$
+
+---
+
+## Class activity
+
+What is the (empirical) probability of contraceptive use?
+
+$P(\text{Contraceptive use} = 1) = 561/911 \approx 0.616$
+
+---
+
+## Class activity
+
+What is the (empirical) probability that a couple will use some contraception, given that the wife is 20 years old? What about if the wife is 30 years old?
+
+$P(\text{Contraceptive use} = 1 | \text{Wife's age} = 20) =$
+
+$P(\text{Contraceptive use} = 1 | \text{Wife's age} = 30) =$
+
+---
+
+## Class activity
+
+What is the (empirical) probability that a couple will use some contraception, given that the wife is 20 years old? What about if the wife is 30 years old?
+
+$P(\text{Contraceptive use} = 1 | \text{Wife's age} = 20) = 11/28 \approx 0.393$
+
+$P(\text{Contraceptive use} = 1 | \text{Wife's age} = 30) = 41/64 \approx 0.641$
+
+---
+
+## Marginal and conditional probabilities
+
+$P(\text{Contraceptive use} = 1 | \text{Wife's age} = x)$ is called a *conditional* probability.
+
+
+$P(\text{Contraceptive use} = 1)$ is called a *marginal* probability.
+
+---
+
+## Odds
+
+What are the (empirical) odds of contraceptive use, if the wife's age is 20 years old? 30 years old?
+
+--
+
+$\dfrac{P(\text{Contraceptive use} = 1 | \text{Wife's age} = 20)}{1 - P(\text{Contraceptive use} = 1 | \text{Wife's age} = 20)} = \dfrac{0.393}{1 - 0.393} = 0.647$
+
+$\dfrac{P(\text{Contraceptive use} = 1 | \text{Wife's age} = 30)}{1 - P(\text{Contraceptive use} = 1 | \text{Wife's age} = 30)} = \dfrac{0.641}{1 - 0.641} = 1.786$
+
+---
+
+## Conceptual question
+
+If the *odds* of an event are $> 1$, what is true about the *probability* of that event?
+
+.abox[
+probability $> 1$
+]
+
+.bbox[
+probability $> 0.25$
+]
+
+.cbox[
+probability $> 0.5$
+]
+
+.dbox[
+probability $> 0.75$
+]
+
+--
+
+**Answer:** probability > 0.5
+
+---
+
+## Conceptual question
+
+Probabilities are always between 0 and 1. What range of values can *odds* take?
+
+.abox[
+Between 0 and 1
+]
+
+.bbox[
+Between 0 and $\infty$
+]
+
+.cbox[
+Between $-\infty$ and $\infty$
+]
+
+.dbox[
+Between 0 and 2
+]
+
+--
+
+**Answer:** between 0 and $\infty$
+
+---
+
+## Class activity, Part II
+
+Spend a few minutes working in groups on Part II of the class activity (questions 4 -- 6)
+
+---
+
+## Class activity
+
+What range of values can the log odds take?
+
+--
+
+Between $-\infty$ and $\infty$
+
+---
+
+## Conceptual question
+
+If the *probability* of an event is $> 0.5$, what is true about the log odds?
+
+.abox[
+log odds $> 0$
+]
+
+.bbox[
+log odds $> 1$
+]
+
+.cbox[
+log odds $> 0.5$
+]
+
+.dbox[
+log odds $< 0$
+]
+
+--
+
+**Answer:** log odds $> 0$
+
+---
+
+## Class activity
+
+True or false: if the log odds are an increasing function of $X$, then the probability is also an increasing function of $X$.
+
+--
+
+**True**
+
+---
+
+## Class activity
+
+**Logistic regression:**
+.center[
+$\log \left( \dfrac{\pi}{1 - \pi} \right) = \beta_0 + \beta_1 \text{Age}$
+]
+
+In general, why is it not appropriate to model the probability, or the odds, as a linear function of the predictor?
+
+--
+
+**Answer:** a linear function takes values between $-\infty$ and $\infty$, so we the left hand side to also take values between $-\infty$ and $\infty$
+
+---
+
+## Next steps
+
+* We will spend the next few weeks talking in depth about logistic regression
+* Download R and RStudio today or tomorrow
+    - Instructions on course website
+    - Please come to office hours or contact me if you have problems!
+* Bring laptop to class from now on
+* Friday: Lab 1
+
+---
+
+## Semester plan
+
+* Logistic regression
+* Multionomial regression
+* Bootstrapping
+* Mixed effects
+* Poisson regression
+
+---
+
+## What I expect you to be familiar with
+
+* EDA (Exploratory data analysis)
+* Linear regression with multiple predictors
+* Comparing and interpreting models
+* Confidence intervals and hypothesis tests
+* Basic R computing
+
+---
+
+.center[
+# Syllabus highlights
+
+(please see the course website [https://sta279-s22.github.io/about/](https://sta279-s22.github.io/about/) for full details)
+
+*Syllabus may change if the public health situation and/or university policies change.*
+]
+
+---
+
+## Getting help
+
+* Office hours 
+    - sign up for 15-minute time slots
+    - Mon 3 -- 4pm, Wed 4:30 -- 5:30pm, Thurs 12 -- 2pm
+* Email (evansc@wfu.edu)
+
+---
+
+## Diversity and Inclusion
+
+In this class, we will embrace diversity of age, background, beliefs, ethnicity, gender, gender identity, gender expression, national origin, neurotype, race, religious affiliation, sexual orientation, and other visible and non-visible categories. The university and I do not tolerate discrimination.
+
+- Let me know ways to improve the effectiveness of the course for you personally, or for other students or student groups.
+- *Names/Pronouns:* You deserve to be addressed in the manner you prefer. To guarantee that I address you properly, you are welcome to tell me your pronoun(s) and/or preferred name at any time, either in person or via email.
+
+---
+
+## Accessibility
+
+If you require accommodations due to a disability or other learning differences, contact Learning Assistance Center & Disability Services at 336-758-5929 or lacds@wfu.edu as soon as possible to better ensure that such accommodations are implemented in a timely fashion. Please feel free
+to contact me, and I will be happy to discuss any necessary accommodations. I always like
+to know how to help my students feel comfortable and successful in our course.
+
+**Scent-free zone:** The 3rd floor of Manchester is a scent-free zone. Please refrain from wearing perfume, cologne, scented lotion, body spray, and all other scented products when visiting the 3rd floor.
+
+---
+
+## Course components
+
+| Component | Weight |
+| --------- | ------ |
+| Homework and Labs |  30%   |
+| Exam 1    |  10%   |
+| Exam 2    |  10%   |
+| Final Exam | 20% |
+| Project 1 |  15%   |
+| Project 2 |  15%   |
+
+---
+
+## Extensions and late work
+
+**Extensions:** You have a bank of **5** extension days, which you may use over the course of the semester. You may use either one or two days for a given assignment.
+
+**Late work:** An assignment will be marked off 20% for every 24 hours it is late (past the original due date).
+
+Example: If an assignment is turned in:
+* 30 minutes -- 24 hours late: lose 20% of points
+* 24 -- 48 hours late: lose 40% of points.
+
+If you know you cannot turn in an assignment (for instance, if you are ill or there is a family emergency), let me know before the assignment is due, and we will work something out. There will be no grade changes
+after our last day of class.
