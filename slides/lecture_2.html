@@ -202,6 +202,44 @@ What if I want the model in terms of `\(\pi_i\)`, instead of the log odds?
 
 ---
 
+## Shape of the regression curve
+
+.large[
+.pull-left[
+`\(\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \ X_i \hspace{0.5cm}\)`
+
+&lt;img src="lecture_2_files/figure-html/unnamed-chunk-2-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+`\(\pi_i = \dfrac{e^{\beta_0 + \beta_1 \ Age_i}}{1 + e^{\beta_0 + \beta_1 \ X_i}}\)`
+
+&lt;img src="lecture_2_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+]
+]
+
+---
+
+## Shape of the regression curve
+
+.large[
+How does the shape of the fitted logistic regression depend on `\(\beta_0\)` and `\(\beta_1\)`?
+
+.pull-left[
+`\(\pi_i = \dfrac{\exp\{\beta_0 +  x_i \}}{1 + \exp\{\beta_0 + x_i \}} \hspace{0.5cm}\)` for `\(\beta_0 = -3, -1, 1\)`
+
+&lt;img src="lecture_2_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+`\(\pi_i = \dfrac{\exp\{-1 +  \beta_1 \ x_i \}}{1 + \exp\{-1 +  \beta_1 \ x_i \}} \hspace{0.5cm}\)` for `\(\beta_1 = 0.5, 1, 2\)`
+
+&lt;img src="lecture_2_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+]
+]
+
+---
+
 ## Parametric modeling
 
 .large[

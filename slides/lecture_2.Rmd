@@ -214,6 +214,102 @@ $\pi_i = \dfrac{e^{\beta_0 + \beta_1 \ Age_i}}{1 + e^{\beta_0 + \beta_1 \ Age_i}
 
 ---
 
+## Shape of the regression curve
+
+.large[
+.pull-left[
+$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \ X_i \hspace{0.5cm}$
+
+```{r echo=F, message=F, warning=F, fig.align='center', fig.width=6, fig.height=4}
+
+data.frame(x = seq(-5, 6, length.out=100),
+           y1 = -1 + seq(-5, 6, length.out=100)) %>%
+  ggplot(aes(x = x, y = y1)) +
+  geom_line(lwd = 2.5) +
+  theme_bw() +
+  labs(x = "x", y = "Log odds") +
+  theme(text = element_text(size = 30))
+```
+]
+
+.pull-right[
+$\pi_i = \dfrac{e^{\beta_0 + \beta_1 \ Age_i}}{1 + e^{\beta_0 + \beta_1 \ X_i}}$
+
+```{r echo=F, message=F, warning=F, fig.align='center', fig.width=6, fig.height=4}
+
+expit <- function(p){
+  return(exp(p)/(1 + exp(p)))
+}
+
+data.frame(x = seq(-5, 6, length.out=100),
+           y1 = expit(-1 + seq(-5, 6, length.out=100))) %>%
+  ggplot(aes(x = x, y = y1)) +
+  geom_line(lwd = 2.5) +
+  theme_bw() +
+  labs(x = "x", y = "P(y = 1)") +
+  theme(text = element_text(size = 30))
+```
+]
+]
+
+---
+
+## Shape of the regression curve
+
+.large[
+How does the shape of the fitted logistic regression depend on $\beta_0$ and $\beta_1$?
+
+.pull-left[
+$\pi_i = \dfrac{\exp\{\beta_0 +  x_i \}}{1 + \exp\{\beta_0 + x_i \}} \hspace{0.5cm}$ for $\beta_0 = -3, -1, 1$
+
+```{r echo=F, message=F, warning=F, fig.align='center', fig.width=6, fig.height=4}
+
+expit <- function(p){
+  return(exp(p)/(1 + exp(p)))
+}
+
+data.frame(x = seq(-5, 6, length.out=100),
+           y1 = expit(-1 + seq(-5, 6, length.out=100)),
+           y2 = expit(-3 + seq(-5, 6, length.out=100)),
+           y3 = expit(1 + seq(-5, 6, length.out=100))) %>%
+  ggplot(aes(x = x, y = y1)) +
+  geom_line(lwd = 2.5) +
+  geom_line(aes(y = y2), lwd=2.5, lty = 2, color="blue") +
+  geom_line(aes(y = y3), lwd=2.5, lty = 3, color="red") +
+  theme_bw() +
+  labs(x = "x", y = "P(y = 1)") +
+  annotate("text", x = -2, y = 0.4, label="1", size=8) +
+  annotate("text", x = 0, y = 0.4, label="-1", size=9) +
+  annotate("text", x = 3.5, y = 0.4, label="-3", size=8) +
+  theme(text = element_text(size = 30))
+```
+]
+
+.pull-right[
+$\pi_i = \dfrac{\exp\{-1 +  \beta_1 \ x_i \}}{1 + \exp\{-1 +  \beta_1 \ x_i \}} \hspace{0.5cm}$ for $\beta_1 = 0.5, 1, 2$
+
+```{r echo=F, message=F, warning=F, fig.align='center', fig.width=6, fig.height=4}
+
+data.frame(x = seq(-5, 6, length.out=100),
+           y1 = expit(-1 + 0.5*seq(-5, 6, length.out=100)),
+           y2 = expit(-1 + seq(-5, 6, length.out=100)),
+           y3 = expit(-1 + 2*seq(-5, 6, length.out=100))) %>%
+  ggplot(aes(x = x, y = y1)) +
+  geom_line(lwd = 2.5) +
+  geom_line(aes(y = y2), lwd=2.5, lty = 2, color="blue") +
+  geom_line(aes(y = y3), lwd=2.5, lty = 3, color="red") +
+  theme_bw() +
+  labs(x = "x", y = "P(y = 1)") +
+  annotate("text", x = 3, y = 0.75, label="0.5", size=8) +
+  annotate("text", x = 1.5, y = 0.75, label="1", size=9) +
+  annotate("text", x = 0.5, y = 0.75, label="2", size=8) +
+  theme(text = element_text(size = 30))
+```
+]
+]
+
+---
+
 ## Parametric modeling
 
 .large[
