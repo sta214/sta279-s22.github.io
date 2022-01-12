@@ -15,7 +15,7 @@ January 10
 
 January 12
 : Parametric models and linear regression
-  : [Slides](https://sta279-s22.github.io/slides/lecture_1.html), [Class activity](https://sta279-s22.github.io/class_activities/ca_lecture1.html)
+  : [Slides](https://sta279-s22.github.io/slides/lecture_2.html), [Class activity](https://sta279-s22.github.io/class_activities/ca_lecture2.html)
   
 : Textbook 3.3.1, 6.2
 
