@@ -14,7 +14,10 @@ January 10
 : [dplyr cheat sheet](https://raw.githubusercontent.com/rstudio/cheatsheets/master/data-transformation.pdf)
 
 January 12
-: EDA + logistic regression
+: Parametric models and linear regression
+  : [Slides](https://sta279-s22.github.io/slides/lecture_1.html), [Class activity](https://sta279-s22.github.io/class_activities/ca_lecture1.html)
+  
+: Textbook 3.3.1, 6.2
 
 January 14
 : **Lab**{: .label .label-purple } Lab 1
