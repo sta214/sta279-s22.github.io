@@ -21,3 +21,4 @@ January 12
 
 January 14
 : **Lab**{: .label .label-purple } Lab 1
+  : [Slides](https://sta279-s22.github.io/slides/lecture_3.html), [Lab](https://sta279-s22.github.io/labs/lab_1.html)

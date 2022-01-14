@@ -1,0 +1,30 @@
+---
+title: Lab 1
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+## Agenda
+
+.large[
+* Lab 1: R refresher
+  * Due Friday, January 21 at 12:00pm (noon) on Canvas
+]
+
+---
+
+## Lab 1: Exploring grad school admissions data
+
+.large[
+[https://sta279-s22.github.io/labs/lab_1.html](https://sta279-s22.github.io/labs/lab_1.html)
+
+* Welcome to work in groups
+]
