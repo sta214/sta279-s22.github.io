@@ -1,0 +1,59 @@
+---
+title: "Class Activity, January 19"
+output: 
+  tufte::tufte_html:
+    css: "lab.css"
+    tufte_variant: "envisioned"
+    highlight: pygments
+link-citations: yes
+---
+
+In this class activity, we will continue working with the grad admissions data. Recall that this data contains information on 400 undergraduates who have applied to graduate school, and the outcome of their applications. The variables include:
+
+* *admit*: whether or not the student was admitted (0 = no, 1 = yes)
+* *gre*: the student’s score on the GRE (graduate record exam)
+* *gpa*: the student’s grade point average
+* *rank*: how prestigious the student’s undergraduate institution is (1 = most prestigious, 2, 3, 4 = least prestigious)
+
+So far, we have looked at the relationship between GPA and acceptance. In this activity you will look at the relationship between GRE score and acceptance.
+
+1. Write down the logistic regression model for the relationship between GRE score and grad school acceptance. Remember to define your notation, and include both pieces of the model (the distribution of the response, and the relationship between the probability of acceptance and GRE score).
+
+<SCRIPT>
+function ShowAndHide(divid) {
+    var x = document.getElementById(divid);
+    if (x.style.display == 'none') {
+        x.style.display = 'block';
+    } else {
+        x.style.display = 'none';
+    }
+}
+</SCRIPT>
+
+<BUTTON ONCLICK="ShowAndHide('q1_solution')">Solution</BUTTON>
+
+<DIV ID="q1_solution" STYLE="display:none">
+Let $Y_i$ be the outcome of the $i$th student's grad applications, and $\pi_i = P(Y_i = 1)$. Let $Score_i$ be the $i$th student's GRE score. Our logistic regression model is
+
+$Y_i \sim Bernoulli(\pi_i)$
+
+$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 Score_i$
+</DIV>
+
+The equation of the fitted logistic regression model is
+
+$\log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.901 + 0.0036 \ Score_i$
+
+2. Is there a positive or negative relationship between GRE score and the probability of acceptance?
+
+<BUTTON ONCLICK="ShowAndHide('q2_solution')">Solution</BUTTON>
+
+<DIV ID="q2_solution" STYLE="display:none">
+The estimated slope of the logistic regression model (0.0036) is positive, so there is a positive relationship between GRE score and the probability of acceptance.
+</DIV>
+
+3. What is the predicted change in the odds of acceptance associated with a one point increase in GRE score?
+
+4. What is the predicted change in the odds of acceptance associated with a 100 point increase in GRE score?
+
+5. The logistic regression model assumes that the change in odds associated with an increase of 1 point in GRE score is constant (as in Exercise 3). Is the change in *probability* also constant?

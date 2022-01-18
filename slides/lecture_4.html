@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Logistic regression interpretation and assumptions</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link rel="stylesheet" href="lab-slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Logistic regression interpretation and assumptions
+
+---
+
+
+
+### Agenda
+
+.large[
+* Today:
+  * Recap logistic regression model
+  * Interpreting coefficients
+  * Model assumptions
+* Reminders: 
+  * Lab 1 due Friday on Canvas
+  * Office hours today and tomorrow
+  * Extension policy
+* MSC hours:
+  * TA: Ethan Lewis
+  * Mondays 7 - 9pm, Kirby 103
+]
+
+---
+
+### Data
+
+.large[
+Data on 400 undergraduate students from different universities, and the outcome of their application to graduate school. Variables include:
+
+* *admit*: whether or not the student was admitted (0 = no, 1 = yes)
+* *gre*: the student’s score on the GRE (graduate record exam)
+* *gpa*: the student’s grade point average
+* *rank*: how prestigious the student’s undergraduate institution is (1 = most prestigious, 2, 3, 4 = least prestigious)
+
+.question[
+What is the relationship between a student's GPA and whether they are accepted to graduate school?
+]
+]
+
+---
+
+### EDA
+
+&lt;img src="lecture_4_files/figure-html/unnamed-chunk-1-1.png" style="display: block; margin: auto;" /&gt;
+
+.large[
+.question[
+Students who were accepted to graduate school tend to have higher GPAs than students who were not accepted.
+]
+]
+
+---
+
+### Logistic regression model
+
+.large[
+* `\(Y_i =\)` whether `\(i\)`th student was accepted (0 = no, 1 = yes)
+* `\(\pi_i = P(Y_i = 1)\)`
+* `\(GPA_i =\)` GPA of `\(i\)`th student
+]
+
+.large[
+What is my logistic regression model?
+
+.abox[
+(A) `\(\hspace{0.2cm} Y_i \sim Bernoulli(\pi_i) \hspace{0.5cm} \pi_i = \beta_0 + \beta_1 GPA_i\)`
+]
+
+.bbox[
+(B) `\(\hspace{0.2cm} Y_i \sim Normal(\pi_i) \hspace{0.5cm} \dfrac{\pi_i}{1 - \pi_i} = \beta_0 + \beta_1 GPA_i\)`
+]
+
+.cbox[
+(C) `\(\hspace{0.2cm} Y_i \sim Bernoulli(\pi_i) \hspace{0.5cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 GPA_i\)`
+]
+]
+
+--
+
+.large[
+**Answer:** (C)
+]
+
+---
+
+### Logistic regression model
+
+.large[
+`\(Y_i \sim Bernoulli(\pi_i) \hspace{0.5cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 GPA_i\)`
+
+* `\(\pi_i =\)` probability of acceptance
+* `\(\dfrac{\pi_i}{1 - \pi_i} =\)` odds of acceptance
+* `\(\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) =\)` log odds of acceptance
+
+]
+
+---
+
+### Concept check
+
+.large[
+The equation of the fitted logistic regression model is
+
+`\(\log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -4.36 + 1.05 \ GPA_i\)`
+
+.question[
+As GPA increases, how does the estimated probability of acceptance to graduate school change?
+]
+
+.abox[
+(A) It increases
+]
+
+.bbox[
+(B) It decreases
+]
+
+.cbox[
+(C) It stays the same
+]
+]
+
+--
+
+.large[
+**Answer:** (A) It increases (because the estimated slope, 1.05, is positive)
+]
+
+---
+
+### Concept check
+
+.large[
+
+`\(\log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -4.36 + 1.05 \ GPA_i\)`
+
+.question[
+What are the estimated **log odds** of acceptance for a student with a GPA of 3.0?
+]
+
+.abox[
+(A) -4.36
+]
+
+.bbox[
+(B) 1.05
+]
+
+.cbox[
+(C) -1.21
+]
+
+.dbox[
+(D) 0.30
+]
+]
+
+--
+
+.large[
+**Answer:** `\(-4.36 + 1.05 \cdot 3.0 = -1.21\)`
+]
+
+---
+
+### Concept check
+
+.large[
+
+`\(\log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -4.36 + 1.05 \ GPA_i\)`
+
+.question[
+What are the estimated **odds** of acceptance for a student with a GPA of 3.0?
+]
+
+.abox[
+(A) 0.013
+]
+
+.bbox[
+(B) 2.86
+]
+
+.cbox[
+(C) -1.21
+]
+
+.dbox[
+(D) 0.30
+]
+]
+
+--
+
+.large[
+**Answer:** `\(\exp\{-1.21\} = 0.30\)`
+]
+
+---
+
+### Concept check
+
+.large[
+
+`\(\log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -4.36 + 1.05 \ GPA_i\)`
+
+.question[
+The estimated odds of acceptance for a student with a GPA of 3.0 are 0.30. How would I interpret those odds?
+]
+
+.abox[
+(A) The probability of acceptance is 30%
+]
+
+.bbox[
+(B) The probability of being accepted is 0.3 times the probability of being rejected
+]
+
+.cbox[
+(C) The probability of being accepted with a GPA of 3.0 is 0.3 times the probability of being accepted with a GPA of 4.0
+]
+]
+
+--
+
+.large[
+**Answer:** (B)
+]
+
+---
+
+### Concept check
+
+.large[
+
+`\(\log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -4.36 + 1.05 \ GPA_i\)`
+
+.question[
+If GPA increases by one unit, what is the associated change in our estimated log odds of acceptance?
+]
+
+.abox[
+(A) An increase of 1.05
+]
+
+.bbox[
+(B) A decrease of 1.05
+]
+
+.cbox[
+(C) An increase of 4.36
+]
+
+.dbox[
+(D) A decrease of 4.36
+]
+]
+
+--
+
+.large[
+**Answer:** (A)
+]
+
+---
+
+### Interpretation
+
+.large[
+
+`\(\log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = \widehat{\beta}_0 + \widehat{\beta}_1 \ X_i\)`
+
+`\(\widehat{\beta}_1 =\)` the change in predicted log odds associated with a one unit increase in `\(X\)`
+
+.question[
+Unfortunately, log odds aren't very natural to think about. Can we interpret `\(\widehat{\beta}_1\)` in terms of *odds* instead? 
+]
+]
+
+---
+
+### Odds ratio
+
+.large[
+`\(\log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -4.36 + 1.05 \ GPA_i\)`
+
+* If `\(GPA_i = 3.0\)`, the estimated odds are `\(\exp\{-4.36 + 1.05 \cdot 3.0\} = 0.298\)`
+* If `\(GPA_i = 4.0\)`, the estimated odds are `\(\exp\{-4.36 + 1.05 \cdot 4.0\} = 0.852\)`
+
+The **odds ratio** is `\(\dfrac{0.852}{0.298} = 2.86\)`
+
+* The odds of acceptance are 2.86 times higher for a student with a GPA of 4.0, compared to a student with a GPA of 3.0
+]
+
+---
+
+### Concept check
+
+.large[
+`\(\log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -4.36 + 1.05 \ GPA_i\)`
+
+.question[
+What is the odds ratio (of acceptance) for a student with a GPA of 3.5, compared to a student with a GPA of 2.5?
+]
+
+.abox[
+(A) 0.50
+]
+
+.bbox[
+(B) 0.18
+]
+
+.cbox[
+(C) 2.86
+]
+]
+
+--
+
+.large[
+**Answer:** `\(\dfrac{\exp\{ -4.36 + 1.05 \cdot 3.5\}}{\exp\{ -4.36 + 1.05 \cdot 2.5\}} = 2.86\)`
+]
+
+---
+
+### Interpretation
+
+.large[
+Fitted model: log odds form
+
+`\(\log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -4.36 + 1.05 \ GPA_i\)`
+
+* For every one unit increase in GPA, we predict that the log odds of acceptance increase by 1.05
+
+Fitted model: odds form
+
+`\(\dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} = e^{ -4.36 + 1.05 \ GPA_i } = e^{-4.36} e^{1.05 \ GPA_i}\)`
+
+* For every one unit increase in GPA, we predict that the odds of acceptance get multiplied by `\(\exp\{1.05\} = 2.86\)`
+]
+
+---
+
+### Interpretation
+
+.large[
+
+`\(\log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = \widehat{\beta}_0 + \widehat{\beta}_1 \ X_i\)`
+
+* `\(\widehat{\beta}_1 =\)` the (additive) change in predicted log odds associated with a one unit increase in `\(X\)` 
+* `\(\exp\{\widehat{\beta}_1\} =\)` the (multiplicative) change in predicted odds associated with a one unit increase in `\(X\)`
+
+.question[
+What about `\(\widehat{\beta}_0\)` and `\(\exp\{\widehat{\beta}_0\}\)`?
+]
+]
+
+--
+
+.large[
+The estimated log odds and odds when `\(X_i = 0\)` (doesn't always make sense)
+]
+
+---
+
+### Class Activity
+
+.large[
+[https://sta279-s22.github.io/class_activities/ca_lecture4.html](https://sta279-s22.github.io/class_activities/ca_lecture4.html)
+]
+
+---
+
+### Class Activity
+
+.large[
+`\(\log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.901 + 0.0036 \ Score_i\)`
+
+.question[
+What is the predicted change in the odds of acceptance associated with a one point increase in GRE score?
+]
+]
+
+--
+
+.large[
+The predicted odds of acceptance are multiplied by `\(\exp\{0.0036\} = 1.0036\)`
+]
+
+---
+
+### Class Activity
+
+.large[
+`\(\log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.901 + 0.0036 \ Score_i\)`
+
+.question[
+What is the predicted change in the odds of acceptance associated with a 100 point increase in GRE score?
+]
+]
+
+--
+
+.large[
+The predicted odds of acceptance are multiplied by `\(\exp\{0.0036 \cdot 100\} = 1.433\)`
+]
+
+---
+
+### Class Activity
+
+.large[
+.question[
+The logistic regression model assumes that the change in odds associated with an increase of 1 point in GRE score is constant. Is the change in *probability* also constant?
+]
+]
+
+--
+
+.large[
+No -- it depends on GRE score.
+
+* Score = 400 `\(\rightarrow\)` probability = 0.19
+* Score = 500 `\(\rightarrow\)` probability = 0.25
+* Score = 600 `\(\rightarrow\)` probability = 0.32
+
+.pull-left[
+Differences:
+  * 0.25 - 0.19 = 0.06
+  * 0.32 - 0.25 = 0.07
+]
+
+.pull-right[
+Ratios:
+  * 0.25/0.19 = 1.32
+  * 0.32/0.25 = 1.28
+]
+]
+
+---
+
+### Logistic regression assumptions
+
+.large[
+`\(Y_i \sim Bernoulli(\pi_i) \hspace{0.5cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 X_i\)`
+
+**Assumption 1 (shape):** The log odds are a linear function of `\(X_i\)`
+  * As a result, a unit increase in `\(X\)` is associated with a constant (additive) change in the log odds, and a constant (multiplicative) change in the odds
+
+]
+
+---
+
+### Assessing shape: empirical log odds
+
+.large[
+Recall the contraceptive survey data:
+
+
+| Age | 20 | 21 | 22 | 23 | 24 | 25 | ... |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Contraceptive use = 0 | 17 | 19 | 27 | 21 | 24 | 33 | ... |
+| Contraceptive use = 1 | 11 | 29 | 32 | 23 | 37 | 47 | ... |
+]
+
+---
+
+### Assessing shape: empirical log odds
+
+.large[
+Want to know if the log odds of contraceptive use are a linear function of age.
+
+**Step 1:** Calculate empirical log odds of contraceptive use for each age.
+
+| Age | 20 | 21 | 22 | 23 | 24 | 25 | ... |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Contraceptive use = 0 | 17 | 19 | 27 | 21 | 24 | 33 | ... |
+| Contraceptive use = 1 | 11 | 29 | 32 | 23 | 37 | 47 | ... |
+| Empirical log odds | log(11/17) = -0.435 | 0.423 | 0.170 | 0.091 | 0.433 | 0.354 | ... |
+]
+
+---
+
+### Assessing shape: empirical log odds
+
+.large[
+Want to know if the log odds of contraceptive use are a linear function of age.
+
+**Step 2:** Plot empirical log odds against age.
+
+&lt;img src="lecture_4_files/figure-html/unnamed-chunk-2-1.png" style="display: block; margin: auto;" /&gt;
+
+The shape assumption is reasonable if the plot looks roughly linear.
+]
+
+---
+
+### Empirical log odds plots
+
+.large[
+Now let's try this with the grad school admissions data:
+
+| GPA | 2.26 | 2.42 | 2.48 | 2.52 | 2.55 | 2.56 | ... |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Admit = 0 | 1 | 1 | 1 | 1 | 1 | 1 | ... |
+| Admit = 1 | 0 | 1 | 0 | 0 | 0 | 0 | ... |
+
+.question[
+What problem do I run into?
+]
+]
+
+--
+
+.large[
+There are a small number of observations for each GPA, so we can't calculate empirical log odds for each GPA.
+
+**Solution:** Divide the data into *bins*
+]
+
+---
+
+### Empirical log odds plots
+
+.large[
+* Divide observations into bins of equal size, based on values of predictor `\(X\)`
+* Calculate empirical log odds in each bin
+* Plot empirical log odds
+
+&lt;img src="lecture_4_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
