@@ -140,7 +140,7 @@ This probability is called the **likelihood**
 ### Likelihood
 
 .large[
-**Definition:** The *likelihood* `\(L(Model | Data) = P(Data | Model)\)` of a model is the probability of the observed data, given that we assume a certain model and certain values for the parameters that define that model.
+**Definition:** The *likelihood* `\(L(Model) = P(Data | Model)\)` of a model is the probability of the observed data, given that we assume a certain model and certain values for the parameters that define that model.
 ]
 
 --
@@ -148,12 +148,16 @@ This probability is called the **likelihood**
 .large[
 * Model: `\(Y_i \sim Bernoulli(\pi_i)\)`, and `\(\widehat{\pi}_i = 0.9\)`
 * Data: `\(y_1,...,y_5 = T, T, T, T, H\)`
-* Likelihood: `\(L(\widehat{\pi}_i | y_1,...,y_5) = P(y_1,...y_5 | \pi_i = 0.9) = 0.00009\)`
+* Likelihood: `\(L(\widehat{\pi}_i) = P(y_1,...y_5 | \pi_i = 0.9) = 0.00009\)`
 ]
 
 ---
 
 ### Class Activity, Part I
+
+.large[
+[https://sta279-s22.github.io/class_activities/ca_lecture_5.html](https://sta279-s22.github.io/class_activities/ca_lecture_5.html)
+]
 
 ---
 
@@ -161,12 +165,12 @@ This probability is called the **likelihood**
 
 .large[
 `\begin{align}
-L(0.2 | y_1,...,y_5) &amp;= P(y_1,...,y_5 | \pi_i = 0.2) \\
+L(0.2) &amp;= P(y_1,...,y_5 | \pi_i = 0.2) \\
 &amp;= (0.2)(0.8)(0.8)(0.2)(0.8) = 0.020
 \end{align}`
 
 `\begin{align}
-L(0.3 | y_1,...,y_5) &amp;= P(y_1,...,y_5 | \pi_i = 0.3) \\ &amp;= (0.3)(0.7)(0.7)(0.3)(0.7) = 0.031
+L(0.3) &amp;= P(y_1,...,y_5 | \pi_i = 0.3) \\ &amp;= (0.3)(0.7)(0.7)(0.3)(0.7) = 0.031
 \end{align}`
 
 .question[
@@ -251,6 +255,10 @@ Suppose `\(\beta_0 = -2, \ \beta_1 = 0.5\)`. What is the likelihood?
 
 ### Class Activity, Part II
 
+.large[
+[https://sta279-s22.github.io/class_activities/ca_lecture_5.html](https://sta279-s22.github.io/class_activities/ca_lecture_5.html)
+]
+
 ---
 
 ### Class Activity, Part II
@@ -267,7 +275,7 @@ Suppose `\(\beta_0 = -2, \ \beta_1 = 0.5\)`. What is the likelihood?
 --
 
 .large[
-`\(L(\widehat{\beta}_0, \widehat{\beta}_1 | y_1,...,y_5) =\)`
+`\(L(\widehat{\beta}_0, \widehat{\beta}_1) =\)`
 
 `\((0.731)(1 - 0.182)(1 - 0.148)(0.5)(1 - 0.198) = 0.204\)`
 ]
@@ -279,10 +287,10 @@ Suppose `\(\beta_0 = -2, \ \beta_1 = 0.5\)`. What is the likelihood?
 .large[
 **Likelihood:** 
 * For estimates `\(\widehat{\beta}_0\)` and `\(\widehat{\beta}_1\)`, `\(\widehat{\pi}_i = \dfrac{\exp\{\widehat{\beta}_0 + \widehat{\beta}_1 X_i\}}{1 + \exp\{\widehat{\beta}_0 + \widehat{\beta}_1 X_i\}}\)`
-* `\(L(\widehat{\beta}_0, \widehat{\beta}_1 | y_1,...,y_n) = P(y_1,...,y_n | \widehat{\beta}_0, \widehat{\beta}_1)\)`
+* `\(L(\widehat{\beta}_0, \widehat{\beta}_1) = P(y_1,...,y_n | \widehat{\beta}_0, \widehat{\beta}_1)\)`
     
 **Maximize:** 
-* Choose `\(\widehat{\beta}_0\)`, `\(\widehat{\beta}_1\)` to maximize `\(L(\widehat{\beta}_0, \widehat{\beta}_1 | y_1,...,y_n)\)`
+* Choose `\(\widehat{\beta}_0\)`, `\(\widehat{\beta}_1\)` to maximize `\(L(\widehat{\beta}_0, \widehat{\beta}_1)\)`
 ]
 
 ---
