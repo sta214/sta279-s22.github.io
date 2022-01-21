@@ -16,3 +16,4 @@ January 21
 : **Lab 1 due**{: .label .label-red }
 
 : **HW 1 released**{: .label .label-yellow }
+  : [HW 1](https://sta279-s22.github.io/homework/homework_1.html)
