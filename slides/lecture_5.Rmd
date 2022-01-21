@@ -348,3 +348,44 @@ Think about the data generating process.
 * **Independence:** Knowing the outcome for one observation doesn't change the probability for another observation
 
 ]
+
+---
+
+### Randomness
+
+.large[
+Randomness often holds, at least as a reasonable approximation.
+
+Example where randomness does not hold:
+
+* Take a piece of paper, and make a grid of squares
+* Each day, color in one of the squares
+* For each square, $Y_i =$ whether the square is colored in
+* $Y_i = 0$ or $1$, but the outcome isn't random
+]
+
+---
+
+### Independence
+
+.large[
+Knowing the outcome for one observation doesn't change the probability for another observation
+
+**Example:** Grad application data: independence is reasonable.
+  * Many graduate schools
+  * Many students applying to those schools
+  * One student's outcome doesn't really affect another student's chance of getting in
+]
+  
+---
+
+### Independence
+
+.large[
+Knowing the outcome for one observation doesn't change the probability for another observation
+
+**Example:** Repeated observations on the same individual: independence might not be reasonable. 
+  * Suppose we observe different grad application data. For each student, we record each school that they applied to, and whether or not they got in
+  * Outcome for each row is 0 (rejected) or 1 (accepted)
+  * But even after accounting for GRE score or GPA, one student's results are likely to be correlated
+]
