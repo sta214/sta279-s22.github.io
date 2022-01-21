@@ -1,0 +1,342 @@
+---
+title: Estimating parameters
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+
+### Agenda
+
+.large[
+* Today:
+  * Likelihoods and parameter estimation
+  * Model assumptions
+]
+
+---
+
+### Goal
+
+.large[
+Logistic regression model:
+
+$Y_i \sim Bernoulli(\pi_i) \hspace{0.5cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 X_i$
+
+.question[
+Given data $X_1, X_2, ..., X_n$, how do I estimate $\beta_0$ and $\beta_1$?
+]
+]
+
+---
+
+### Motivating example
+
+.large[
+$Y_i =$ result of flipping a coin (Heads or Tails)
+
+.question[
+Is $Y_i$ a random variable?
+]
+]
+
+--
+
+.large[
+Yes -- there are two possible outcomes, but we don't know which will happen until we flip the coin.
+]
+
+---
+
+### Motivating example
+
+.large[
+$Y_i =$ result of flipping a coin (Heads or Tails)
+
+Let's make a model:
+
+* **Step 1:** Distribution of the response
+
+.center[
+$Y_i \sim Bernoulli(\pi_i)$
+]
+
+* **Step 2:** Construct a model for the parameters
+
+.center[
+$\pi_i = ??$
+]
+]
+
+--
+
+.large[
+Right now, we don't have any information to help us estimate $\pi_i$
+]
+
+---
+
+### Motivating example
+
+.large[
+$Y_i =$ result of flipping a coin (Heads or Tails)
+
+Suppose your friend estimates that the probability of heads is 0.9
+
+* $Y_i \sim Bernoulli(\pi_i)$
+* $\widehat{\pi}_i = 0.9$
+
+.question[
+How can we assess whether this estimate $\widehat{\pi}_i$ is reasonable?
+]
+]
+
+--
+
+.large[
+See if the estimate fits observed data.
+]
+
+---
+
+### Motivating example
+
+.large[
+Suppose we flip the coin 5 times, and observe
+
+.center[
+$y_1,...,y_5 = T, T, T, T, H$
+]
+
+.question[
+What is the probability of (i.e., how *likely* is) getting this string of flips if $\pi_i = 0.9$?
+]
+]
+
+--
+
+.large[
+\begin{align}
+P(y_1,...,y_5 | \pi_i = 0.9) &= (0.1)(0.1)(0.1)(0.1)(0.9) \\
+&= (0.1)^4 (0.9) \\
+&= 0.00009
+\end{align}
+
+This probability is called the **likelihood**
+]
+
+---
+
+### Likelihood
+
+.large[
+**Definition:** The *likelihood* $L(Model | Data) = P(Data | Model)$ of a model is the probability of the observed data, given that we assume a certain model and certain values for the parameters that define that model.
+]
+
+--
+
+.large[
+* Model: $Y_i \sim Bernoulli(\pi_i)$, and $\widehat{\pi}_i = 0.9$
+* Data: $y_1,...,y_5 = T, T, T, T, H$
+* Likelihood: $L(\widehat{\pi}_i | y_1,...,y_5) = P(y_1,...y_5 | \pi_i = 0.9) = 0.00009$
+]
+
+---
+
+### Class Activity, Part I
+
+---
+
+### Class Activity
+
+.large[
+\begin{align}
+L(0.2 | y_1,...,y_5) &= P(y_1,...,y_5 | \pi_i = 0.2) \\
+&= (0.2)(0.8)(0.8)(0.2)(0.8) = 0.020
+\end{align}
+
+\begin{align}
+L(0.3 | y_1,...,y_5) &= P(y_1,...,y_5 | \pi_i = 0.3) \\ &= (0.3)(0.7)(0.7)(0.3)(0.7) = 0.031
+\end{align}
+
+.question[
+Which value, 0.2 or 0.3, seems more reasonable?
+]
+]
+
+--
+
+.large[
+0.3, since the probability of the observed data is higher
+]
+
+---
+
+### Class Activity
+
+.large[
+.question[
+Which value of $\widehat{\pi}_i$ in the table would you pick?
+]
+]
+
+--
+
+.large[
+$\widehat{\pi}_i = 0.4$, since it has the highest likelihood
+]
+
+---
+
+### Maximum likelihood
+
+.large[
+**Maximum likelihood principle:** estimate the parameters to be the values that maximize the likelihood
+
+| $\widehat{\pi}_i$ | Likelihood |
+| :---: | :---: |
+| 0.30 | 0.031 |
+| 0.35 | 0.033 |
+| 0.40 | 0.036 |
+| 0.45 | 0.033 |
+
+Maximum likelihood estimate: $\widehat{\pi}_i = 0.4$
+]
+
+---
+
+### Maximum likelihood
+
+.large[
+**Maximum likelihood principle:** estimate the parameters to be the values that maximize the likelihood
+
+Steps for maximum likelihood estimation:
+
+* *Likelihood*: For each potential value of the parameter, compute the likelihood of the observed data
+* *Maximize*: Find the parameter value that gives the largest likelihood
+]
+
+---
+
+### Maximum likelihood for logistic regression
+
+.large[
+$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \ Size_i \hspace{1cm} \pi_i = \dfrac{\exp\{\beta_0 + \beta_1 \ Size_i \}}{1 + \exp\{\beta_0 + \beta_1 \ Size_i \}}$
+
+**Observed data:** 
+
+| Tumor cancerous | Yes | No | No | Yes | No |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| **Size of tumor (cm)** | **6** | **1** | **0.5** | **4** | **1.2** |
+
+]
+
+--
+
+.large[
+Suppose $\beta_0 = -2, \ \beta_1 = 0.5$. What is the likelihood?
+]
+
+---
+
+### Class Activity, Part II
+
+---
+
+### Class Activity, Part II
+
+.large[
+$\widehat{\pi}_i = \dfrac{\exp\{-2 + 0.5 \ Size_i \}}{1 + \exp\{-2 + 0.5 \ Size_i \}}$
+
+| Tumor cancerous | Yes | No | No | Yes | No |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| **Size of tumor (cm)** | **6** | **1** | **0.5** | **4** | **1.2** |
+| $\widehat{\pi}_i$ | 0.731 | 0.182 | 0.148 | 0.500 | 0.198 |
+]
+
+--
+
+.large[
+$L(\widehat{\beta}_0, \widehat{\beta}_1 | y_1,...,y_5) =$
+
+$(0.731)(1 - 0.182)(1 - 0.148)(0.5)(1 - 0.198) = 0.204$
+]
+
+---
+
+### Maximum likelihood for logistic regression
+
+.large[
+**Likelihood:** 
+* For estimates $\widehat{\beta}_0$ and $\widehat{\beta}_1$, $\widehat{\pi}_i = \dfrac{\exp\{\widehat{\beta}_0 + \widehat{\beta}_1 X_i\}}{1 + \exp\{\widehat{\beta}_0 + \widehat{\beta}_1 X_i\}}$
+* $L(\widehat{\beta}_0, \widehat{\beta}_1 | y_1,...,y_n) = P(y_1,...,y_n | \widehat{\beta}_0, \widehat{\beta}_1)$
+    
+**Maximize:** 
+* Choose $\widehat{\beta}_0$, $\widehat{\beta}_1$ to maximize $L(\widehat{\beta}_0, \widehat{\beta}_1 | y_1,...,y_n)$
+]
+
+---
+
+### Assumptions
+
+.large[
+.question[
+What assumptions have we used in calculating the likelihood for logistic regression?
+]
+]
+
+--
+
+.large[
+* **Shape:** $\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \ Size_i$  (so we can calculate the probability for each observation)
+* **Randomness:** The outcome $Y_i$ is a random variable
+* **Independence:** The observations are independent (so we can multiply probabilities together)
+]
+
+---
+
+### Assessing shape
+
+.large[
+Empirical log odds plots
+]
+
+```{r, echo=F, message=F, warning=F, fig.align='center', fig.width=6, fig.height=4}
+library(tidyverse)
+cmc_data <- read_csv("cmc.data.txt", col_names = F)
+colnames(cmc_data) <-c("WifeAge", "WifeEdu", "HusbandEdu", "NumChild", "WifeRel", "WifeWork", "HusbandOcc","Living", "Media", "Choice")
+cmc_data$Choice <- ifelse( cmc_data$Choice == 1, "None", ifelse(cmc_data$Choice==2, "Short", "Long"))
+cmc_data$ChoiceBin <- ifelse(cmc_data$Choice =="None", 0 , 1)
+cmc_data <- cmc_data %>% 
+  filter(WifeAge >= 20, WifeAge <= 35)
+
+cmc_data %>%
+  group_by(WifeAge) %>%
+  summarize(prop = mean(ChoiceBin),
+          log_odds = log(prop/(1 - prop))) %>%
+  ggplot(aes(x = WifeAge, y = log_odds)) +
+  geom_point(size = 2) +
+  geom_smooth(method = "lm", se=F, lwd = 1.5) +
+  labs(x = "Age", y = "Empirical log odds") +
+  theme_bw() +
+  theme(text = element_text(size = 20))
+```
+
+---
+
+### Assessing randomness and independence
+
+.large[
+Think about the data generating process.
+
+* **Randomness:** The data come from a random process, like a random sample or experiment
+* **Independence:** Knowing the outcome for one observation doesn't change the probability for another observation
+
+]
