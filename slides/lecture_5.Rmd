@@ -19,6 +19,7 @@ editor_options:
 * Today:
   * Likelihoods and parameter estimation
   * Model assumptions
+* HW 1 released later tonight
 ]
 
 ---
