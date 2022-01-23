@@ -1,0 +1,144 @@
+---
+title: "Lab 1 Solutions"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+grad_app <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+```
+
+**Total points:** 24
+
+## Question 1 (2pts)
+
+```{r}
+glimpse(grad_app)
+```
+
+There are 400 students in the data.
+
+## Question 2 (2pts)
+
+```{r}
+grad_app_no_na <- grad_app %>%
+  drop_na()
+glimpse(grad_app_no_na)
+```
+
+There are 400 students in the `grad_app_no_na` data. Since the number of rows is the same as the original data, there are no missing values in the original data.
+
+## Question 3 (3pts)
+
+```{r}
+grad_app_prestigious <- grad_app %>%
+  filter(rank == 1)
+
+glimpse(grad_app_prestigious)
+```
+
+There are 61 students who attended prestigious schools.
+
+**Grading:** 
+
+* Take 1 point off if they used the wrong rank in filtering (e.g., rank == 4)
+* Take 1 point off if the don't answer the second part of the question (how many students attended prestigious schools)
+
+## Question 4 (1 pt)
+
+```{r}
+grad_app %>%
+  ggplot(aes(x = admit)) +
+  geom_bar() +
+  labs(x = "Accepted to grad school?",
+       title = "Bar chart of grad school acceptance") +
+  theme_bw()
+```
+
+**Grading:** I provided the code, so they just need to run it.
+
+## Question 5 (4 pts)
+
+```{r}
+grad_app %>%
+  ggplot(aes(x = gpa)) +
+  geom_histogram() +
+  labs(x = "GPA",
+       title = "Distribution of GPA") +
+  theme_bw()
+```
+
+The distribution of GPA ranges between about 2.5 and 4.0, and appears to be slightly left skewed and bimodal, with peaks around 3.5 and 4.0. Since there is an upper limit to GPA (most universities do not have GPAs above 4.0), it makes sense that we would see a peak at the upper limit.
+
+**Grading:** 2pts for the plot, 2pts for interpretation. I didn't give specific directions for what I wanted them to talk about in interpreting the histogram, so as long as they say something reasonable that matches the histogram, they can get full points. Otherwise, take off 1 -- 2 points for incorrect interpretation (depending on how wrong it is). For the plot, they need to label the x-axis and add a title, but the label/title don't need to be the same as mine.
+
+
+## Question 6 (2 pts)
+
+```{r}
+grad_app %>%
+  summarize(mean_gpa = mean(gpa),
+            sd_gpa = sd(gpa))
+```
+
+
+## Question 7 (1 pt)
+
+```{r}
+class(grad_app$admit)
+```
+
+R thinks that `admit` is an `integer` variable (i.e., a number).
+
+
+## Question 8 (2 pts)
+
+```{r}
+grad_app <- grad_app %>%
+  mutate(admit = as.factor(admit))
+
+grad_app %>%
+  ggplot(aes(x = admit, y = gpa)) +
+  geom_boxplot() +
+  labs(x = "Acceptance to grad school",
+       y = "GPA",
+       title = "GPA vs. acceptance to grad school") +
+  theme_bw()
+```
+
+**Grading:** They need to label the axes and add a title, but the labels and title don't have to be exactly the same as mine.
+
+
+## Question 9 (2 pts)
+
+```{r}
+grad_app %>%
+  group_by(admit) %>%
+  summarize(mean_gpa = mean(gpa),
+            sd_gpa = sd(gpa))
+```
+
+
+## Question 10 (2 pts)
+
+While the variability in GPA is similar between the two groups (accepted vs. rejected), students who were accepted to graduate school tend to have higher GPAs than students who were rejected (an average of 3.49 for accepted students, vs. 3.34 for rejected students).
+
+**Grading:** Take off 1 point for incorrect interpretation. As long as they say something like the solution here, they can get full credit.
+
+
+## Question 11 (3 pts)
+
+```{r}
+table(grad_app$rank, grad_app$admit)
+```
+
+There are 61 undergrads at the "most prestigious" schools (rank = 1). So the probability of acceptance is 33/61 = 0.54, and the odds of acceptance are 33/28 = 1.18.
+
+**Grading:**
+
+* Take off 1 point for using the wrong rank
+* Take off 1 point for using the incorrect denominator (e.g., 400 instead of 61). We're conditioning on the student being at a rank 1 school
+* Take off 1 point for incorrectly calculating the odds

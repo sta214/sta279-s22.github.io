@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Maximum likelihood estimation</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link rel="stylesheet" href="lab-slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Maximum likelihood estimation
+
+---
+
+
+### Likelihood
+
+.large[
+**Definition:** The *likelihood* `\(L(Model) = P(Data | Model)\)` of a model is the probability of the observed data, given that we assume a certain model and certain values for the parameters that define that model.
+]
+
+--
+
+.large[
+Coin example: flip a coin 5 times, with `\(\pi_i = P(Heads)\)`
+* Model: `\(Y_i \sim Bernoulli(\pi_i)\)`, and `\(\widehat{\pi}_i = 0.9\)`
+* Data: `\(y_1,...,y_5 = T, T, T, T, H\)`
+* Likelihood: `\(L(\widehat{\pi}_i) = P(y_1,...y_5 | \pi_i = 0.9) = 0.00009\)`
+]
+
+---
+
+### Likelihood
+
+.large[
+Coin example: flip a coin 5 times, with `\(\pi_i = P(Heads)\)`. 
+
+Observed data: T, T, T, T, H
+
+Compare `\(\widehat{\pi}_i = 0.9\)` and `\(\widehat{\pi}_i = 0.1\)`
+
+* `\(L(0.9) = (0.1)(0.1)(0.1)(0.1)(0.9) = (0.1)^4(0.9) = 0.00009\)`
+* `\(L(0.1) = (0.9)(0.9)(0.9)(0.9)(0.1) = (0.9)^4(0.1) = 0.0656\)`
+
+.question[
+Which estimate, 0.1 or 0.9, is a better estimate?
+]
+]
+
+--
+
+.large[
+0.1
+]
+
+---
+
+### Maximum likelihood
+
+.large[
+.question[
+`\(\widehat{\pi}_i = 0.1\)` is a better estimate than `\(\widehat{\pi}_i = 0.9\)`. But can we do any better? Is there a different value of `\(\widehat{\pi}_i\)` with a higher likelihood?
+]
+]
+
+--
+
+.large[
+**Maximum likelihood estimation:** Choose value of `\(\widehat{\pi}_i\)` that maximizes the likelihood 
+* **Option 1:** Compute likelihood for other values of `\(\widehat{\pi}_i\)` by hand (tedious)
+* **Option 2:** Compute likelihood for other values of `\(\widehat{\pi}_i\)` in R
+* **Option 3:** Maximize likelihood using calculus
+]
+
+---
+
+### Computing likelihood in R
+
+.large[
+Observed data: T, T, T, T, H
+
+* We are going to consider several different potential values for `\(\widehat{\pi}_i\)`:
+
+.center[
+`\(0, 0.1, 0.2, 0.3,..., 0.9, 1\)`
+]
+
+* For each potential value, we will compute the likelihood:
+
+.center[
+`\(L(\widehat{\pi}_i) = (1 - \widehat{\pi}_i)^4(\widehat{\pi}_i)\)`
+]
+
+* We then see which value has the highest likelihood.
+* Is this all possible values? No, but let's start here.
+]
+
+---
+
+### R code
+
+.large[
+```r
+# List the values for pi hat
+pi_hat &lt;- seq(from = 0, to = 1, by = 0.1)
+```
+]
+--
+
+.large[
+* This creates a sequence (`seq`) from 0 to 1, in increments of 0.1
+
+.center[
+`\(0, 0.1, 0.2, 0.3,..., 0.9, 1\)`
+]
+]
+
+---
+
+### R code
+
+.large[
+```r
+# List the values for pi hat
+pi_hat &lt;- seq(from = 0, to = 1, by = 0.1)
+
+# Create a space to store the likelihoods
+likelihood &lt;- rep(0,length(pi_hat))
+```
+]
+--
+
+.large[
+* We then create a vector filled with 11 zeros
+* Think about this as a storage box
+* We will replace the 0s with the likelihoods as we calculate them
+]
+
+---
+
+### R code
+
+.large[
+```r
+# List the values for pi hat
+pi_hat &lt;- seq(from = 0, to = 1, by = 0.1)
+
+# Create a space to store the likelihoods
+likelihood &lt;- rep(0,length(pi_hat))
+
+# Compute and store the likelihoods
+for( i in 1:length(pi_hat) ){
+  likelihood[i] &lt;- pi_hat[i]*(1-pi_hat[i])^4
+}
+```
+]
+
+--
+
+.large[
+* This last piece of code is called a *for loop*
+* We compute the likelihood for each value of `\(\widehat{\pi}_i\)` we are considering
+]
+
+
+---
+
+### Results
+
+
+| pi_hat| likelihood|
+|------:|----------:|
+|    0.0|    0.00000|
+|    0.1|    0.06561|
+|    0.2|    0.08192|
+|    0.3|    0.07203|
+|    0.4|    0.05184|
+|    0.5|    0.03125|
+|    0.6|    0.01536|
+|    0.7|    0.00567|
+|    0.8|    0.00128|
+|    0.9|    0.00009|
+|    1.0|    0.00000|
+
+.large[
+.question[
+Which estimate `\(\widehat{\pi}_i\)` gives us the largest likelihood?
+]
+]
+
+---
+
+### Maximum likelihood estimation
+
+.large[
+* Our estimate so far is `\(\widehat{\pi}_i = 0.2\)`. But we haven't explored all possible values
+* Let's try some more!
+
+.center[
+`\(0, 0.01, 0.02, ..., 0.98, 0.99, 1\)`
+]
+]
+
+---
+
+### R code
+
+.large[
+.question[
+Which code do I need to change for our new values?
+]
+]
+
+.large[
+```r
+# List the values for pi hat
+pi_hat &lt;- seq(from = 0, to = 1, by = 0.1)
+
+# Create a space to store the likelihoods
+likelihood &lt;- rep(0,length(pi_hat))
+
+# Compute and store the likelihoods
+for( i in 1:length(pi_hat) ){
+  likelihood[i] &lt;- pi_hat[i]*(1-pi_hat[i])^4
+}
+```
+]
+
+---
+
+### R code
+
+.large[
+Just the first part (creating `pi_hat`)
+
+```r
+# List the values for pi hat
+pi_hat &lt;- seq(from = 0, to = 1, by = 0.01)
+
+# Create a space to store the likelihoods
+likelihood &lt;- rep(0,length(pi_hat))
+
+# Compute and store the likelihoods
+for( i in 1:length(pi_hat) ){
+  likelihood[i] &lt;- pi_hat[i]*(1-pi_hat[i])^4
+}
+```
+]
+
+---
+
+### Results
+
+&lt;img src="lecture_6_files/figure-html/unnamed-chunk-2-1.png" style="display: block; margin: auto;" /&gt;
+
+.large[
+The largest likelihood is again at `\(\widehat{\pi}_i = 0.2\)`
+]
+
+---
+
+### Class Activity, Part I
+
+---
+
+### Class Activity
+
+.large[
+.center[
+`\(L(\widehat{\pi}_0) = \ ?\)`
+]
+]
+
+---
+
+### Class Activity
+
+.large[
+.center[
+`\(L(\widehat{\pi}_0) = (2 \widehat{\pi}_0)^3 (\widehat{\pi}_0)^2(1 - 3 \widehat{\pi}_0)\)`
+
+`\(\log L(\widehat{\pi}_0) = 3 \log(2) + 3 \log(\widehat{\pi}_0) + 2 \log( \widehat{\pi}_0) + \log(1 - 3 \widehat{\pi}_0)\)`
+]
+]
+
+---
+
+### Class Activity
+
+.large[
+```r
+# List the values for pi hat
+pi_hat &lt;- seq(from = 0, to = 1, by = 0.05)
+
+# Create a space to store the likelihoods
+likelihood &lt;- rep(0,length(pi_hat))
+
+# Compute and store the likelihoods
+for( i in 1:length(pi_hat) ){
+  likelihood[i] &lt;- (2*pi_hat[i])^3 * (pi_hat[i])^2 * (1 - 3 * pi_hat[i])
+}
+```
+
+.question[
+What is our estimate `\(\widehat{\pi}_0\)`?
+]
+]
+
+---
+
+### So far
+
+.large[
+* Our R code suggests that `\(\widehat{\pi}_i\)` maximizes the likelihood
+* BUT, we haven't considered all possible values of `\(\widehat{\pi}_i\)`
+* We could consider more values, but we can't compute a likelihood for every possible `\(\widehat{\pi}_i\)`, even in R
+* Luckily, we don't have to
+]
+
+---
+
+### Maximum likelihood estimation with calculus
+
+.large[
+**Step 1:** Write down the likelihood
+
+* Let `\(\widehat{\pi}_i\)` be the estimate of `\(\pi_i\)`
+* Let `\(n\)` be the number of observations (in coin flipping example, `\(n = 5\)`)
+* Let `\(k\)` be the number of times `\(Y_i = 1\)` in the data (in coin flipping example, `\(k = 1\)`)
+
+.center[
+`\(L(\widehat{\pi}_i) = \widehat{\pi}_i^k(1 - \widehat{\pi}_i)^{n-k}\)`
+]
+
+]
+
+---
+
+### Maximum likelihood estimation with calculus
+
+.large[
+**Step 1:** Write down the likelihood
+
+.center[
+`\(L(\widehat{\pi}_i) = \widehat{\pi}_i^k(1 - \widehat{\pi}_i)^{n-k}\)`
+]
+
+**Step 2:** Take the log
+
+.center[
+`\(\log L(\widehat{\pi}_i) = k \log (\widehat{\pi}_i) + (n - k) \log (1 - \widehat{\pi}_i)\)`
+]
+
+* An advantage of taking the log is that it turns multiplication into addition, and exponents into multiplication
+* This makes maximization easier
+* Maximizing the log likelihood is the same as maximizing the likelihood
+]
+
+---
+
+### Maximum likelihood estimation with calculus
+
+.large[
+**Step 2:** log likelihood
+
+.center[
+`\(\log L(\widehat{\pi}_i) = k \log (\widehat{\pi}_i) + (n - k) \log (1 - \widehat{\pi}_i)\)`
+]
+
+* We want to find the value of `\(\widehat{\pi}_i\)` that maximizes this function
+
+.question[
+How do we find where maxima/minima occur for a function?
+]
+]
+
+--
+
+.large[
+*Take the first derivative and set equal to 0!*
+]
+
+---
+
+### Maximum likelihood estimation with calculus
+
+.large[
+Want to differentiate
+.center[
+`\(\log L(\widehat{\pi}_i) = k \log (\widehat{\pi}_i) + (n - k) \log (1 - \widehat{\pi}_i)\)`
+]
+]
+
+.large[
+Remember some rules for differentiation:
+
+* `\(\dfrac{d}{dx} \log x = \dfrac{1}{x}\)`
+* `\(\dfrac{d}{dx} c f(x) = c \dfrac{d}{dx} f(x)\)` for constant `\(c\)`
+* `\(\dfrac{d}{dx} (f(x) + g(x)) = \dfrac{d}{dx} f(x) + \dfrac{d}{dx} g(x)\)`
+]
+
+---
+
+### Maximum likelihood estimation with calculus
+
+.large[
+**Step 3:** take the first derivative, and set = 0
+.center[
+`\(\log L(\widehat{\pi}_i) = k \log (\widehat{\pi}_i) + (n - k) \log (1 - \widehat{\pi}_i)\)`
+]
+
+`\begin{align}
+\dfrac{d}{d \widehat{\pi}_i} \log L(\widehat{\pi}_i) &amp;= \dfrac{k}{\widehat{\pi}_i} - \dfrac{n - k}{1 - \widehat{\pi}_i} \\
+&amp;= 0
+\end{align}`
+]
+
+---
+
+### Maximum likelihood estimation with calculus
+
+.large[
+.center[
+`\(\log L(\widehat{\pi}_i) = k \log (\widehat{\pi}_i) + (n - k) \log (1 - \widehat{\pi}_i)\)`
+]
+
+`\begin{align}
+\dfrac{d}{d \widehat{\pi}_i} \log L(\widehat{\pi}_i) &amp;= \dfrac{k}{\widehat{\pi}_i} - \dfrac{n - k}{1 - \widehat{\pi}_i} \\
+&amp;= 0
+\end{align}`
+
+.center[
+`\(\dfrac{k}{\widehat{\pi}_i} = \dfrac{n - k}{1 - \widehat{\pi}_i}\)`
+
+`\(k(1 - \widehat{\pi}_i) = (n-k)\widehat{\pi}_i\)`
+
+`\(k - k \widehat{\pi}_i = n \widehat{\pi}_i - k \widehat{\pi}_i\)`
+
+`\(\widehat{\pi}_i = \dfrac{k}{n}\)`
+]
+]
+
+--
+
+.large[
+So our maximum likelihood estimate is `\(\widehat{\pi}_i = \dfrac{k}{n}\)`
+]
+
+---
+
+### Maximum likelihood estimation with calculus
+
+.large[
+So our maximum likelihood estimate is `\(\widehat{\pi}_i = \dfrac{k}{n}\)`, the sample proportion
+
+* Our data: T, T, T, T, H
+* This implies that `\(\widehat{\pi}_i = \dfrac{1}{5} = 0.2\)`
+* This matches what we saw in R
+]
+
+---
+
+### Class activity, Part II
+
+---
+
+### Class activity, Part II
+
+.large[
+.center[
+`\(\log L(\widehat{\pi}_0) = 3 \log(2) + 3 \log(\widehat{\pi}_0) + 2 \log( \widehat{\pi}_0) + \log(1 - 3 \widehat{\pi}_0)\)`
+
+`\(\dfrac{d}{d \widehat{\pi}_0} \log L(\widehat{\pi}_0) = \ ?\)`
+]
+]
+
+---
+
+### Class activity, Part II
+
+.large[
+.center[
+`\(\log L(\widehat{\pi}_0) = 3 \log(2) + 3 \log(\widehat{\pi}_0) + 2 \log( \widehat{\pi}_0) + \log(1 - 3 \widehat{\pi}_0)\)`
+
+`\(\dfrac{d}{d \widehat{\pi}_0} \log L(\widehat{\pi}_0) = \dfrac{3}{\widehat{\pi}_0} + \dfrac{2}{\widehat{\pi}_0} - \dfrac{3}{1 - 3 \widehat{\pi}_0} = 0\)`
+]
+]
+
+--
+
+.large[
+.center[
+`\(\dfrac{5}{\widehat{\pi}_0} = \dfrac{3}{1 - 3\widehat{\pi}_0}\)`
+
+`\(\dfrac{1 - 3\widehat{\pi}_0}{\widehat{\pi}_0} = \dfrac{3}{5}\)`
+
+`\(\dfrac{1}{\widehat{\pi}_0} = \dfrac{18}{5}\)`
+
+`\(\widehat{\pi}_0 = \dfrac{5}{18} = 0.278\)`
+]
+]
+
+---
+
+### Next time
+
+.large[
+* Maximum likelihood estimation for logistic regression
+* Fitting logistic regression in R
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
