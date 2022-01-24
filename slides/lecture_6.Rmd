@@ -281,6 +281,10 @@ The largest likelihood is again at $\widehat{\pi}_i = 0.2$
 
 ### Class Activity, Part I
 
+.large[
+[https://sta279-s22.github.io/class_activities/ca_lecture_6.html](https://sta279-s22.github.io/class_activities/ca_lecture_6.html)
+]
+
 ---
 
 ### Class Activity
@@ -317,7 +321,8 @@ likelihood <- rep(0,length(pi_hat))
 
 # Compute and store the likelihoods
 for( i in 1:length(pi_hat) ){
-  likelihood[i] <- (2*pi_hat[i])^3 * (pi_hat[i])^2 * (1 - 3 * pi_hat[i])
+  likelihood[i] <- (2*pi_hat[i])^3 * 
+      (pi_hat[i])^2 * (1 - 3 * pi_hat[i])
 }
 ```
 
@@ -386,7 +391,9 @@ $\log L(\widehat{\pi}_i) = k \log (\widehat{\pi}_i) + (n - k) \log (1 - \widehat
 .center[
 $\log L(\widehat{\pi}_i) = k \log (\widehat{\pi}_i) + (n - k) \log (1 - \widehat{\pi}_i)$
 ]
+]
 
+.large[
 * We want to find the value of $\widehat{\pi}_i$ that maximizes this function
 
 .question[
@@ -481,6 +488,10 @@ So our maximum likelihood estimate is $\widehat{\pi}_i = \dfrac{k}{n}$, the samp
 ---
 
 ### Class activity, Part II
+
+.large[
+[https://sta279-s22.github.io/class_activities/ca_lecture_6.html](https://sta279-s22.github.io/class_activities/ca_lecture_6.html)
+]
 
 ---
 
