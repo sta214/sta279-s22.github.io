@@ -17,6 +17,13 @@ class: center, middle, inverse, title-slide
 
 ### Agenda
 
+.large[
+* Recap from last class
+* Continuing maximum likelihood estimation
+* Fitting logistic regression in R
+* Reminder: HW 1 due Friday at noon on Canvas
+]
+
 ---
 
 ### Recap
@@ -175,7 +182,7 @@ Log likelihood:
 
 .large[
 .center[
-`\(Y_i \sim Bernoulli(\pi_i) \hspace{0.5cm} \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 X_i\)`
+`\(Y_i \sim Bernoulli(\pi_i) \hspace{0.5cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 X_i\)`
 ]
 ]
 
@@ -239,7 +246,7 @@ Likelihood:
 ]
 
 .large[
-* Because we have to parameters, `\(\beta_0\)` and `\(\beta_1\)`, the situation is more difficult
+* Because we have two parameters, `\(\beta_0\)` and `\(\beta_1\)`, the situation is more difficult
 * The math to find MLEs `\(\widehat{\beta}_0\)` and `\(\widehat{\beta}_1\)` is more complex than we will cover
 * R calculates `\(\widehat{\beta}_0\)` and `\(\widehat{\beta}_1\)` for us
 ]

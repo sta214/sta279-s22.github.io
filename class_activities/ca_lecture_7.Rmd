@@ -1,5 +1,5 @@
 ---
-title: "Class Activity, January 24"
+title: "Class Activity, January 26"
 output: 
   tufte::tufte_html:
     css: "lab.css"
@@ -36,7 +36,7 @@ $\log L(\widehat{\pi}_0) = 3 \log(2) + 3 \log(\widehat{\pi}_0) + 2 \log( \wideha
 
 In the slides, we fit a logistic regression model in R on the grad application data from Lab 1, with GPA as a predictor. Now let's consider GRE as a predictor instead. Our logistic regression model is
 
-$Y_i \sim Bernoulli(\pi_i) \hspace{0.5cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \text{GRE_i}$
+$Y_i \sim Bernoulli(\pi_i) \hspace{0.5cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \text{GRE}_i$
 
 2. Fit this logistic regression model in R, and report the equation of the fitted model.
 
