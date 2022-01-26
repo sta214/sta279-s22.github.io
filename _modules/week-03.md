@@ -14,3 +14,5 @@ January 26
 
 January 28
 : **Lab**{: .label .label-purple } Lab 2
+
+: **HW 1 due**{: .label .label-red }

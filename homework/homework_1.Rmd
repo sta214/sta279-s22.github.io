@@ -85,4 +85,10 @@ You suggest instead that $\pi_i = 0.62$. Calculate the likelihood (the probabili
 #### Question 8
 
 Of course, we need to consider more potential values of $\pi_i$ than just 0.45 and 0.62. But manually calculating the likelihood for every possible value of $\pi_i$ would be both tedious and impossible. Instead, use calculus to calculate the maximum likelihood estimate from the observed set of ten people with responses 1, 1, 1, 1, 0, 0, 0, 0, 1, 1.
+
+You will need to:
+
+* Write down the likelihood and log likelihood as a function of $\widehat{\pi}_i$
+* Differentiate the log likelihood and set equal to 0
+* Solve for $\widehat{\pi}_i$
 :::
