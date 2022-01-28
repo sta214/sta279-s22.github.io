@@ -168,7 +168,7 @@ To use the function, you will need to specify the inputs, meaning the pieces of 
 Create the empirical logit plot by completing the code below: 
 
 ```r
-logodds_plot(titanic_train, 30, "equal_size", "Fare", "Survived",
+logodds_plot(titanic, 30, "equal_size", "Fare", "Survived",
              reg_formula = y ~ x)
 ```
 
