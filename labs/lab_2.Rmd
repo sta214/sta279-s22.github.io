@@ -63,7 +63,7 @@ Looking at the available variables, there are some that are not valid choices fo
 :::{.question}
 #### Question 2
 
-Does the data set have any missing data? If so, remove the missing data and state how many rows you are now left with.
+Does the data set have any missing data? If so, remove the missing data and state how many rows you are now left with. (You will need to overwrite the `titanic` data, so that it does not contain any missing values).
 
 :::
 
