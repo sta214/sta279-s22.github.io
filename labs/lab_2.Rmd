@@ -165,7 +165,7 @@ To use the function, you will need to specify the inputs, meaning the pieces of 
 :::{.question}
 #### Question 5
 
-Create the empirical logit plot by completing the code below: 
+Create the empirical logit plot by running the code below: 
 
 ```r
 logodds_plot(titanic, 30, "equal_size", "Fare", "Survived",
