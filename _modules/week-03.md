@@ -14,5 +14,6 @@ January 26
 
 January 28
 : **Lab**{: .label .label-purple } Lab 2
+  : [Slides](https://sta279-s22.github.io/slides/lecture_8.html), [Lab](https://sta279-s22.github.io/labs/lab_2.html)
 
 : **HW 1 due**{: .label .label-red }

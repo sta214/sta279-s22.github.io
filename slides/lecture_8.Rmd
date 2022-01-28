@@ -1,0 +1,43 @@
+---
+title: Lab 2
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+### Agenda
+
+.large[
+* Major/minor declaration
+* Lab 2: 
+  * Due next Friday
+  * fitting logistic regression
+  * maximum likelihood estimation
+]
+
+---
+
+### Major/minor declaration
+
+.large[
+* January 31 -- February 4
+* You may declare a major or minor in the Math and Stats dept. if you have *completed* 40 credit hours
+* Open house opportunities for statistics:
+  * Tuesday, February 1, 5:00pm-6:00pm In Person in Manchester 122
+  * Wednesday, February 2, 4:00pm-5:00pm via Zoom
+]
+
+---
+
+### Lab 2
+
+.large[
+[https://sta279-s22.github.io/labs/lab_2.html](https://sta279-s22.github.io/labs/lab_2.html)
+]
