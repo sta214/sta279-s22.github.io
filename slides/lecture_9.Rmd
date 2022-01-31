@@ -14,6 +14,15 @@ editor_options:
 
 ## Agenda
 
+.large[
+* Reminder: Math and Stats info sessions
+  * Math: Today 2:30 - 3:30 (Zoom), 3:30 - 4:30 (in person, Manchester 124)
+  * Stats: Tuesday 5 - 6 (in person, Manchester 122), Wednesday 4 - 5 (Zoom)
+* Likelihood ratio tests
+* Wald tests
+* Confidence intervals
+]
+
 
 ---
 
@@ -383,7 +392,9 @@ Confidence interval for $\beta_1$:
 .center[
 $\widehat{\beta}_1 \pm z^* SE_{\widehat{\beta}_1}$
 ]
+]
 
+.large[
 where $z^* =$ critical value of $N(0, 1)$ distribution.
 ]
 
@@ -546,6 +557,10 @@ grad_app <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
 grad_glm <- glm(admit ~ gpa, data = grad_app, family=binomial)
 summary(grad_glm)
 ```
+]
 
+--
+
+.large[
 $1.05 \pm 1.96 \cdot 0.2989 = (0.464, 1.636)$
 ]
