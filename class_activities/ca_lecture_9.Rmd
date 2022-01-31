@@ -1,0 +1,74 @@
+---
+title: "Class Activity, January 31"
+output: 
+  tufte::tufte_html:
+    css: "lab.css"
+    tufte_variant: "envisioned"
+    highlight: pygments
+link-citations: yes
+---
+
+## Setup
+
+In this activity, we will revisit the grad application data. In the slides we looked at GRE as a predictor; here we will use GPA.
+
+We are interested in the logistic regression model for the relationship between GPA and admission to grad school:
+
+$Y_i \sim Bernoulli(\pi_i) \hspace{0.5cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 GPA_i$
+
+1. You are interested in testing whether there is any relationship between GPA and the probability of grad school admission. Carry out both a Wald test and a likelihood ratio test to investigate this question, and report your results. *In practice, we would just do one test, rather than both of them. But since this is a class activity, I want you to try both tests.*
+
+<SCRIPT>
+function ShowAndHide(divid) {
+    var x = document.getElementById(divid);
+    if (x.style.display == 'none') {
+        x.style.display = 'block';
+    } else {
+        x.style.display = 'none';
+    }
+}
+</SCRIPT>
+
+<BUTTON ONCLICK="ShowAndHide('q1_solution')">Solution</BUTTON>
+
+<DIV ID="q1_solution" STYLE="display:none">
+**Hypotheses:**
+
+$H_0: \beta_1 = 0 \hspace{0.5cm} H_A: \beta_1 \neq 0$
+
+**Wald test:**
+
+```{r, include=F}
+grad_app <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+```
+
+```{r}
+grad_glm <- glm(admit ~ gpa, data = grad_app, family=binomial)
+summary(grad_glm)
+```
+
+test statistic: $z = 3.517$. p-value = 0.00043. This p-value is small, so we have strong evidence that there is a relationship between GPA and the probability of admission.
+
+**Likelihood ratio test:**
+
+full model: $\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 GPA_i$
+
+reduced model: $\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0$
+
+test statistic: $G = 499.98 - 486.97 = 13.01$
+
+degrees of freedom: 1 (we are testing a single parameter), so $G \sim \chi^2_1$
+
+p-value:
+
+```{r}
+pchisq(13.01, df=1, lower.tail=F)
+```
+
+</DIV>
+
+2. Instead of the research question in exercise 1, you want to know whether students with a higher GPA have a greater chance of acceptance. Write down your hypotheses in terms of a parameter in the model.
+
+3. Which test (Wald, likelihood ratio, or both) can you use to test the hypotheses in question 2? Carry out the hypothesis test. *Hint: to calculate a p-value for a normal distribution, the `pnorm` function is useful. Use `pnorm(..., lower.tail=F)` for a right-tail alternative, and `pnorm(..., lower.tail=T)` for a left-tail alternative.*
+
+4. Calculate a 95% confidence interval for $\beta_1$ in the logistic regression model.

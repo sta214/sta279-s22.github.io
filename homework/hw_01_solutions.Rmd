@@ -1,0 +1,72 @@
+---
+title: "HW 1 Solutions"
+output: html_document
+---
+
+Total: 22 pts
+
+## Question 1 (4 pts)
+
+$$Y_i \sim Bernoulli(\pi_i)$$
+
+$$log \left( \frac{\pi_i}{1-\pi_i}  \right) = \beta_0 + \beta_1 X_i$$
+
+**Grading:**
+
+* Take off a point if the subscripts are not correct. 
+* Take off a point if they do not include the distribution for Y. 
+* NO points if they use LSLR regression. 
+
+## Question 2 (2 pts)
+
+If an individual is age 18-24, we predict the log odds of choosing a traditional hotel first will decrease by .61 (versus someone outside of that range - this part is optional)
+
+**Grading:** Take off 1 point if they interpret in terms of increasing age by one year
+
+
+## Question 3 (2 pts)
+
+If an individual is age 18-24, we predict the odds of choosing a traditional hotel first will decrease by a multiplier/factor of .54, or by 46% (versus someone outside of that range - this part is optional)
+
+**Grading:** Take off 1 point if they interpret in terms of increasing age by one year
+
+
+## Question 4 (2 pts)
+
+If an individual is not age 18-24, we predict the log odds of choosing a hotel first is .95.
+
+**Grading:** Take off 1 point if they interpret in terms of Age = 0
+
+## Question 5 (3 pts)
+
+$$\hat{\pi_i} = \frac{e^{.95 -.61(1)}}{1 + e^{.95 -.61(1)}} = .584 \Rightarrow  1 - \hat{\pi}_i = .416$$
+**Grading:** Take off a point if they plug in $X_i = 19$ instead of $X_i = 1$
+
+## Question 6 (2 pts)
+
+$$L(0.45) = .45^6(.55^4)=.00076$$
+
+## Question 7 (2 pts)
+
+$$L(0.62) = .62^6(.38^4)=0.02048 = .00118 \approx .0012$$
+
+## Question 8 (5 pts)
+
+Likelihood:
+
+$$L(\widehat{\pi}_i) = \widehat{\pi}_i^6(1 - \widehat{\pi}_i)^4$$
+Log likelihood:
+
+$$\log L(\widehat{\pi}_i) = 6 \log(\widehat{\pi}_i) + 4 \log(1 - \widehat{\pi}_i)$$
+Derivative:
+
+$$\dfrac{d}{d \widehat{\pi}_i} \log L(\widehat{\pi}_i) = \dfrac{6}{\widehat{\pi}_i} - \dfrac{4}{1 - \widehat{\pi}_i} = 0$$
+
+Solve for $\widehat{\pi}_i$:  $\widehat{\pi}_i = \dfrac{6}{10} = 0.6$
+
+**Grading:** 
+
+* 1 point for likelihood/log likelihood (it is ok if they work with just the likelihood)
+* 2 points for the derivative
+* 2 points for solving for $\widehat{\pi}_i$
+

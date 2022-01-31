@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Inference with logistic regression models</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link rel="stylesheet" href="lab-slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Inference with logistic regression models
+
+---
+
+
+## Agenda
+
+
+---
+
+### Recap: maximum likelihood estimation for logistic regression
+
+.large[
+**Likelihood:** 
+* For estimates `\(\widehat{\beta}_0\)` and `\(\widehat{\beta}_1\)`, `\(\widehat{\pi}_i = \dfrac{\exp\{\widehat{\beta}_0 + \widehat{\beta}_1 X_i\}}{1 + \exp\{\widehat{\beta}_0 + \widehat{\beta}_1 X_i\}}\)`
+* `\(L(\widehat{\beta}_0, \widehat{\beta}_1) = P(\text{data} | \text{model}) = \prod \limits_{i=1}^n \widehat{\pi}_i^{Y_i}(1 - \widehat{\pi}_i)^{1 - Y_i}\)`
+    
+**Maximize:** 
+* Choose `\(\widehat{\beta}_0\)`, `\(\widehat{\beta}_1\)` to maximize `\(L(\widehat{\beta}_0, \widehat{\beta}_1)\)`
+]
+
+---
+
+### Deviance
+
+.large[
+**Deviance:** If `\(L\)` is the likelihood, then deviance is given by `\(-2 \log L\)`
+
+* Maximizing likelihood is equivalent to minimizing deviance
+* Deviance is analogous to SSE from linear regression
+]
+
+.large[
+.question[
+We can use deviance to test hypotheses about model parameters.
+]
+]
+    
+---
+
+### Example: GRE and grad school admission
+
+.large[
+`\(Y_i \sim Bernoulli(\pi_i) \hspace{0.5cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \text{GRE}_i\)`
+
+We want to know if there is actually a relationship between GRE score and grad school admission.
+
+.question[
+How can I express this as null and alternative hypotheses about one or more model parameters?
+]
+]
+
+--
+
+.large[
+`\(H_0: \beta_1 = 0 \hspace{0.5cm} H_A: \beta_1 \neq 0\)`
+]
+
+---
+
+### Example: GRE and grad school admission
+
+.large[
+`\(Y_i \sim Bernoulli(\pi_i) \hspace{0.5cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \text{GRE}_i\)`
+
+`\(H_0: \beta_1 = 0 \hspace{0.5cm} H_A: \beta_1 \neq 0\)`
+]
+
+
+
+.large[
+
+```r
+grad_glm &lt;- glm(admit ~ gre, data = grad_app, 
+                family=binomial)
+summary(grad_glm)
+```
+
+```
+...
+## 
+*##     Null deviance: 499.98  on 399  degrees of freedom
+*## Residual deviance: 486.06  on 398  degrees of freedom
+...
+```
+]
+
+---
+
+### Comparing deviances
+
+.large[
+
+```
+...
+## 
+*##     Null deviance: 499.98  on 399  degrees of freedom
+*## Residual deviance: 486.06  on 398  degrees of freedom
+...
+```
+
+499.98 = deviance for intercept-only model `\(\hspace{0.5cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0\)` 
+
+486.06 = deviance for full model `\(\hspace{0.5cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \text{GRE}_i\)`
+]
+
+--
+
+.large[
+**drop-in-deviance:** deviance for reduced model - deviance for full model = 13.92
+]
+
+---
+
+### Comparing deviances
+
+.large[
+499.98 = deviance for intercept-only model `\(\hspace{0.5cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0\)` 
+
+486.06 = deviance for full model `\(\hspace{0.5cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \text{GRE}_i\)`
+
+**drop-in-deviance:** deviance for reduced model - deviance for full model = 13.92
+
+.question[
+Intuition: a larger drop in deviance is stronger evidence for a relationship between GRE and grad school acceptance
+]
+]
+
+---
+
+### Comparing deviances
+
+.large[
+**drop-in-deviance:** `\(G =\)` deviance for reduced model - deviance for full model = 13.92
+
+Full model: `\(\hspace{0.5cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \text{GRE}_i\)` 
+
+* degrees of freedom: `\(df_{\text{full}} = n - p_{\text{full}} = 400 - 2 = 398\)`
+
+Reduced model: `\(\hspace{0.5cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0\)`
+
+* degrees of freedom: `\(df_{\text{reduced}} = n - p_{\text{reduced}} = 400 - 1 = 399\)`
+
+.question[
+Why is `\(G\)` always `\(\geq 0\)`?
+]
+]
+
+---
+
+### Comparing deviances
+
+.large[
+**drop-in-deviance:** `\(G =\)` deviance for reduced model - deviance for full model = 13.92
+
+Full model: `\(\hspace{0.5cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \text{GRE}_i\)` 
+
+* `\(df_{\text{full}} = n - p_{\text{full}} = 400 - 2 = 398\)`
+
+Reduced model: `\(\hspace{0.5cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0\)`
+
+* `\(df_{\text{reduced}} = n - p_{\text{reduced}} = 400 - 1 = 399\)`
+
+`\(H_0: \beta_1 = 0 \hspace{1cm} H_A: \beta_1 \neq 0\)`
+
+.question[
+If `\(H_0\)` is true, how unusual is `\(G = 13.92\)`?
+]
+]
+
+---
+
+### `\(\chi^2\)` distribution
+
+.large[
+Under `\(H_0\)`, `\(G \sim \chi^2_{df_{\text{reduced}} - df_{\text{full}}}\)`
+
+`\(\chi^2_k\)` distribution: parameterized by degrees of freedom `\(k\)`
+]
+
+.center[
+&lt;img src="Chi-square_pdf.png" width="600"&gt;
+]
+
+
+---
+
+### Computing a p-value
+
+.large[
+`\(\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \text{GRE}_i\)` 
+
+`\(H_0: \beta_1 = 0 \hspace{1cm} H_A: \beta_1 \neq 0\)`
+
+`\(G =\)` deviance for reduced model - deviance for full model = 13.92 `\(\sim \chi^2_1\)`
+
+
+```r
+pchisq(13.92, df = 1, lower.tail=FALSE)
+```
+
+```
+## [1] 0.0001907579
+```
+]
+
+---
+
+### Concept check
+
+.large[
+Our p-value is 0.0002. What is the most appropriate conclusion?
+
+.abox[
+(A) We reject the null hypothesis, since `\(p &lt; 0.05\)`.
+]
+
+.bbox[
+(B) We fail to reject the null hypothesis, since `\(p &lt; 0.05\)`.
+]
+
+.cbox[
+(C) The data provide strong evidence of a relationship between GRE score and the probability of admission to graduate school.
+]
+
+.dbox[
+(D) The data do not provide strong evidence of a relationship between GRE score and the probability of admission to graduate school.
+]
+]
+
+--
+
+.large[
+**Answer:** (C)
+
+* In this class, we do not reject/accept/fail to reject
+* We do not compare against 0.05 (or 0.01, or 0.1, etc.)
+]
+
+---
+
+### Likelihood ratio test for nested models
+
+.large[
+* Compare full and reduced models. Example:
+    * full model: `\(\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \text{GRE}_i\)`
+    * reduced model: `\(\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0\)`
+]
+
+---
+
+### Likelihood ratio test for nested models
+
+.large[
+* Compare full and reduced models
+* Calculate deviance ( `\(-2 \log L\)` ) for full and reduced models. Example:
+    * deviance for full model = 486.06
+    * deviance for reduced model = 499.98
+]
+
+---
+
+### Likelihood ratio test for nested models
+
+.large[
+* Compare full and reduced models
+* Calculate deviance ( `\(-2 \log L\)` ) for full and reduced models
+* Test statistic: `\(G =\)` deviance for reduced model - deviance for full model
+    * Example: `\(G = 499.98 - 486.06 = 13.92\)`
+]
+--
+.large[
+* p-value: `\(G \sim \chi^2_{df_{\text{reduced}} - df_{\text{full}}}\)`
+    * Example: `\(G \sim \chi^2_1\)`
+]
+
+---
+
+### Likelihood ratio test: strength and weakness
+
+.large[
+**Strength:** Can test multiple parameters at once. E.g.,
+`$$H_0: \beta_1 = \beta_2 = \beta_3 = 0$$`
+
+`$$H_A: \text{at least one of } \beta_1, \beta_2, \beta_3 \neq 0$$`
+**Weaknesses:** 
+
+* Cannot test one-sided alternative. E.g., can't test
+
+`$$H_0: \beta_1 = 0 \hspace{0.5cm} H_A: \beta_1 &gt; 0$$`
+* Cannot test for values other than 0. E.g., can't test
+
+`$$H_0: \beta_1 = 1 \hspace{0.5cm} H_A: \beta_1 \neq 1$$`
+]
+
+---
+
+### Alternative: Wald tests for single parameters
+
+.large[
+`\(\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \text{GRE}_i\)` 
+
+`\(H_0: \beta_1 = b \hspace{1cm} H_A: \beta_1 \neq b\)` 
+
+* or `\(H_A: \beta_1 &gt; b\)`, or `\(H_A: \beta_1 &lt; b\)`
+* `\(b\)` is any value of interest (e.g., 0)
+
+`\(z = \dfrac{\widehat{\beta}_1 - b}{SE_{\widehat{\beta}_1}} \sim N(0, 1)\)` (under `\(H_0\)` )
+]
+
+---
+
+### Example
+
+.large[
+`\(\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \text{GRE}_i\)` 
+
+`\(H_0: \beta_1 = 0 \hspace{1cm} H_A: \beta_1 \neq 0\)`
+
+
+```
+...
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -2.901344   0.606038  -4.787 1.69e-06 ***
+*## gre          0.003582   0.000986   3.633  0.00028 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+...
+```
+
+`\(z = \dfrac{0.00358}{0.00099} = 3.633 \hspace{0.5cm} \sim N(0, 1)\)`
+
+p-value = 0.00028
+]
+
+---
+
+### Wald tests vs. likelihood ratio tests
+
+.large[
+.pull-left[
+**Wald test**
+
+* like t-tests
+* test a single parameter
+* some example hypotheses:
+    * `\(H_0: \beta_1 = 0\)` vs. `\(H_A: \beta_1 \neq 0\)`
+    * `\(H_0: \beta_1 = 1\)` vs. `\(H_A: \beta_1 &gt; 1\)`
+]
+
+.pull-right[
+**Likelihood ratio test**
+
+* like nested F-tests
+* test one or more parameters 
+* some example hypotheses:
+    * `\(H_0: \beta_1 = 0\)` vs. `\(H_A: \beta_1 \neq 0\)`
+]
+
+p-values are different, because test statistics and distributions are different
+]
+
+---
+
+### Confidence intervals
+
+.large[
+Confidence interval for `\(\beta_1\)`:
+
+.center[
+`\(\widehat{\beta}_1 \pm z^* SE_{\widehat{\beta}_1}\)`
+]
+
+where `\(z^* =\)` critical value of `\(N(0, 1)\)` distribution.
+]
+
+---
+
+### Computing `\(z^*\)`
+
+.large[
+
+Example: for a 95% confidence interval, `\(z^* = 1.96\)`
+
+
+```r
+qnorm(0.025, lower.tail=F)
+```
+
+```
+## [1] 1.959964
+```
+
+Example: for a 99% confidence interval, `\(z^* = 2.58\)`
+
+
+```r
+qnorm(0.005, lower.tail=F)
+```
+
+```
+## [1] 2.575829
+```
+]
+
+---
+
+### Example
+
+.large[
+`\(\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \text{GRE}_i\)` 
+
+
+```
+...
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -2.901344   0.606038  -4.787 1.69e-06 ***
+*## gre          0.003582   0.000986   3.633  0.00028 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+...
+```
+
+95% confidence interval for `\(\beta_1\)`: 
+
+.center[
+`\(0.00358 \pm 1.96 \cdot 0.00099 = (0.0016, 0.0055)\)`
+]
+
+.question[
+How should I interpret this interval?
+]
+]
+
+---
+
+### Example
+
+.large[
+`\(\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \text{GRE}_i\)` 
+
+95% confidence interval for `\(\beta_1\)`: 
+
+.center[
+`\(0.00358 \pm 1.96 \cdot 0.00099 = (0.0016, 0.0055)\)`
+]
+
+We are 95% confident that the log odds of being accepted to graduate school increases between 0.0016 and 0.0055 for each 1 point increase in GRE score.
+]
+
+---
+
+### Example
+
+.large[
+`\(\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \text{GRE}_i\)` 
+
+95% confidence interval for `\(\beta_1\)`: 
+
+.center[
+`\(0.00358 \pm 1.96 \cdot 0.00099 = (0.0016, 0.0055)\)`
+]
+
+We are 95% confident that the log odds of being accepted to graduate school increases between 0.0016 and 0.0055 for each 1 point increase in GRE score.
+
+.question[
+What if I want to interpret the slope in terms of the odds?
+]
+]
+
+---
+
+### Example
+
+.large[
+`\(\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \text{GRE}_i\)` 
+
+95% confidence interval for `\(\beta_1\)`: 
+
+.center[
+`\(0.00358 \pm 1.96 \cdot 0.00099 = (0.0016, 0.0055)\)`
+]
+]
+
+.large[
+`\((e^{0.0016}, e^{0.0055}) = (1.0016, 1.0055)\)`
+
+We are 95% confident that the odds of being accepted to graduate school increase by a factor of between 1.0016 and 1.0055 for each 1 point increase in GRE score.
+]
+
+---
+
+### Class activity
+
+.large[
+[https://sta279-s22.github.io/class_activities/ca_lecture_9.html](https://sta279-s22.github.io/class_activities/ca_lecture_9.html)
+]
+
+---
+
+### Class activity: hypotheses
+
+.large[
+.question[
+Do students with a higher GPA have a greater chance of admission?
+]
+]
+
+--
+
+.large[
+`\(H_0: \beta_1 = 0 \hspace{0.5cm} H_A: \beta_1 &gt; 0\)`
+]
+
+---
+
+### Class activity: which test?
+
+.large[
+`\(H_0: \beta_1 = 0 \hspace{0.5cm} H_A: \beta_1 &gt; 0\)`
+]
+
+--
+
+.large[
+Wald, since the alternative is one-sided.
+]
+
+---
+
+### Class activity: Wald test
+
+.large[
+`\(H_0: \beta_1 = 0 \hspace{0.5cm} H_A: \beta_1 &gt; 0\)`
+
+`\(z = 3.517\)`
+
+
+```r
+pnorm(3.517, lower.tail=F)
+```
+
+```
+## [1] 0.0002182269
+```
+]
+
+---
+
+### Class activity: confidence interval
+
+.large[
+
+```
+...
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -4.3576     1.0353  -4.209 2.57e-05 ***
+## gpa           1.0511     0.2989   3.517 0.000437 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+...
+```
+
+`\(1.05 \pm 1.96 \cdot 0.2989 = (0.464, 1.636)\)`
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
