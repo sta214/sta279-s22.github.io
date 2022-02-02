@@ -1,0 +1,808 @@
+---
+title: Logistic regression with multiple predictors
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+### Agenda
+
+.large[
+* Lab 2 due Monday
+* Exam 1 moved
+* Today:
+  * multiple logistic regression
+  * likelihood ratio tests
+  * AIC
+]
+
+---
+
+### Scenario: dengue fever in Vietnam
+
+.large[
+* *Dengue fever*: a mosquito-borne viral disease, which infects hundreds of millions of people a year. Common in tropical climates
+* Researchers in Vietnam are interested in identifying the relationship between specific symptoms and the probability of having dengue
+  * E.g.: a patient goes to the hospital with fever and abdominal pain. What is the probability they have dengue?
+* Lab tests are available, but may take time to return results and/or be expensive
+]
+
+---
+
+### Data
+
+.large[
+Data on 5720 Vietnamese children, admitted to hospital with possible dengue fever. Variables include:
+* `Dengue`: whether the patient actually has dengue fever, based on a lab test (0 = no, 1 = yes)
+* `Temperature`: patient's body temperature (in Celsius)
+* `Abdominal`: whether the patient has abdominal pain (0 = no, 1 = yes)
+* `HCT`: patient's hematocrit (proportion of red blood cells)
+* `Age`: patient's age (in years)
+* `Sex`: patient's sex 
+* `+` several others
+]
+
+---
+
+### Research question
+
+.large[
+You are approached by the researchers to help analyze their data. Their initial question: 
+
+*What is the relationship between temperature and the probability of dengue, and does the relationship differ if the patient also presents with abdominal pain?*
+]
+
+---
+
+### Exploratory data analysis
+
+.large[
+.question[
+How can we visualize the relationship between temperature and the probability of having dengue?
+]
+]
+
+--
+
+.large[
+*An empirical log odds plot!*
+]
+
+---
+
+### Exploratory data analysis
+
+```{r echo=F, message=F, warning=F, fig.width=7, fig.height=5, fig.align='center'}
+library(tidyverse)
+library(knitr)
+
+hook_output <- knit_hooks$get("output")
+knit_hooks$set(output = function(x, options) {
+   lines <- options$output.lines
+   if (is.null(lines)) {
+     return(hook_output(x, options))  # pass to default hook
+   }
+   x <- unlist(strsplit(x, "\n"))
+   more <- "..."
+   if (length(lines)==1) {        # first n lines
+     if (length(x) > lines) {
+       # truncate the output, but add ....
+       #x <- c(head(x, lines), more)
+       x <- c(head(x, lines))
+     }
+   } else {
+     #x <- c(more, x[lines], more)
+     x <- c(x[lines])
+   }
+   # paste these lines together
+   x <- paste(c(x, ""), collapse = "\n")
+   hook_output(x, options)
+ })
+
+dengue_original <- read.csv("dengue_original.csv")
+
+logodds_plot <- function(data, num_bins, bin_method,
+                         x, y, grouping = NULL, reg_formula = y ~ x){
+  
+  if(is.null(grouping)){
+    dat <- data.frame(x = data[,x], 
+                      y = data[,y],
+                      group = 1)
+  } else {
+    dat <- data.frame(x = data[,x], 
+               y = data[,y],
+               group = data[,grouping])
+  }
+  
+  if(bin_method == "equal_size"){
+    logodds_table <- dat %>%
+      drop_na() %>%
+      arrange(group, x) %>%
+      group_by(group) %>%
+      mutate(obs = y,
+             bin = rep(1:num_bins,
+                       each=ceiling(n()/num_bins))[1:n()]) %>%
+      group_by(bin, group) %>%
+      summarize(mean_x = mean(x),
+                prop = mean(c(obs, 0.5)),
+                num_obs = n()) %>%
+      ungroup() %>%
+      mutate(logodds = log(prop/(1 - prop)))
+  } else {
+    logodds_table <- dat %>%
+      drop_na() %>%
+      group_by(group) %>%
+      mutate(obs = y,
+             bin = cut(x, 
+                       breaks = num_bins,
+                       labels = F)) %>%
+      group_by(bin, group) %>%
+      summarize(mean_x = mean(x),
+                prop = mean(c(obs, 0.5)),
+                num_obs = n()) %>%
+      ungroup() %>%
+      mutate(logodds = log(prop/(1 - prop)))
+  }
+  
+  if(is.null(grouping)){
+    logodds_table %>%
+      ggplot(aes(x = mean_x,
+                 y = logodds)) +
+      geom_point(size=2.5) +
+      geom_smooth(se=F, method="lm", formula = reg_formula) +
+      theme_bw() +
+      labs(x = x,
+           y = "Empirical log odds") +
+      theme(text = element_text(size=25))
+  } else {
+    logodds_table %>%
+      ggplot(aes(x = mean_x,
+                 y = logodds,
+                 color = group,
+                 shape = group)) +
+      geom_point(size=2.5) +
+      geom_smooth(se=F, method="lm", formula = reg_formula) +
+      theme_bw() +
+      labs(x = x,
+           y = "Empirical log odds",
+           color = grouping,
+           shape = grouping) +
+      theme(text = element_text(size=25))
+  }
+  
+}
+
+### Do some data cleaning
+dengue <- dengue_original %>%
+  select(SiteNo, Sex, Age, DayDisease, Vomiting, Abdo, Muco, Skin,
+         Temp, BMI, Height, Weight, Flush, Rash, WBC, HCT, PLT, 
+         NS1_TRIP, Lab_Confirmed_Dengue) %>%
+  rename(SiteNumber = SiteNo, 
+         DiseaseDay = DayDisease,
+         Abdominal = Abdo,
+         Mucosal = Muco,
+         Temperature = Temp, 
+         RapidTest = NS1_TRIP,
+         Dengue = Lab_Confirmed_Dengue) %>%
+  mutate(Vomiting = as.factor(2 - Vomiting),
+         Abdominal = as.factor(2 - Abdominal),
+         Mucosal = as.factor(2 - Mucosal),
+         Skin = as.factor(2 - Skin),
+         Flush = as.factor(2 - Flush),
+         Rash = as.factor(2 - Rash),
+         RapidTest = ifelse(RapidTest == 1, "positive", "negative"),
+         Dengue = 2 - Dengue,
+         Sex = ifelse(Sex == 1, "male", "female")) %>% 
+  drop_na()
+
+logodds_plot(dengue, 12, "equal_size", x = "Temperature", y = "Dengue")
+```
+
+.large[
+.question[
+Based on the empirical log odds plot, what would be a reasonable model for the relationship between temperature and the probability a patient has dengue?
+]
+]
+
+---
+
+### Initial model
+
+.large[
+$$Y_i \sim Bernoulli(\pi_i)$$
+
+$$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \ Temperature_i$$
+]
+
+--
+
+.large[
+We're also interested in whether this relationship is different depending on abdominal pain.
+.question[
+What plot can I use to investigate this question?
+]
+]
+
+---
+
+### Exploratory data analysis
+
+```{r echo=F, message=F, warning=F, fig.width=9, fig.height=5, fig.align='center'}
+logodds_plot(dengue, 10, "equal_size", x = "Temperature", y = "Dengue",
+             grouping = "Abdominal")
+```
+
+.large[
+.question[
+Based on this plot, what would be a reasonable model that incorporates both temperature and abdominal pain?
+]
+]
+
+---
+
+### Adding abdominal pain
+
+.large[
+$$Y_i \sim Bernoulli(\pi_i)$$
+]
+
+.large[
+\begin{align}
+\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) &= \beta_0 + \beta_1 \ Temperature_i + \beta_2 \ Abdominal_i \\ & \hspace{0.5cm} + \beta_3 \ Temperature_i \cdot Abdominal_i
+\end{align}
+]
+
+.large[
+* The interaction term allows the relationship between temperature and $\pi_i$ to change depending on abdominal pain
+]
+
+---
+
+### Class activity, Part I
+
+---
+
+### Class activity
+
+.large[
+\begin{align}
+\log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) &= -7.745 + 0.178 \ Temperature_i \\
+& \hspace{0.5cm} - 6.129 \ Abdominal_i \\ 
+& \hspace{0.5cm} + 0.166 \ Temperature_i \cdot Abdominal_i
+\end{align}
+]
+
+.large[
+.question[
+What is the estimated probability of dengue for a patient with a temperature of 38C and abdominal pain?
+]
+]
+
+--
+
+.large[
+\begin{align}
+\log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) &= -7.745 + 0.178(38) - 6.129 + 0.166(38) \\
+&= -0.802 \\
+\widehat{\pi}_i &= 0.31
+\end{align}
+]
+
+---
+
+### Class activity
+
+.large[
+\begin{align}
+\log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) &= -7.745 + 0.178 \ Temperature_i \\
+& \hspace{0.5cm} - 6.129 \ Abdominal_i \\ 
+& \hspace{0.5cm} + 0.166 \ Temperature_i \cdot Abdominal_i
+\end{align}
+]
+
+.large[
+.question[
+For patients with abdominal pain, what is the estimated change in odds associated with an increase in temperature of 1C?
+]
+]
+
+--
+
+.large[
+$\widehat{\beta}_1 + \widehat{\beta}_3 = 0.344$
+
+$e^{0.344} = 1.41$
+
+So an increase in temperature of 1C is associated with an increase in the odds of dengue by a factor of 1.41.
+]
+
+---
+
+### Class activity
+
+.large[
+$$Y_i \sim Bernoulli(\pi_i)$$
+
+\begin{align}
+\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) &= \beta_0 + \beta_1 \ Temperature_i + \beta_2 \ Abdominal_i \\ 
+& \hspace{0.5cm} + \beta_3 \ Temperature_i \cdot Abdominal_i
+\end{align}
+]
+
+.large[
+I want to test whether there is a relationship between abdominal pain and the probability of dengue, after accounting for the relationship between temperature and the probability of dengue.
+.question[
+What are my null and alternative hypotheses?
+]
+]
+
+--
+
+.large[
+$$H_0: \beta_2 = \beta_3 = 0$$
+
+$$H_A: \text{at least one of } \beta_2, \beta_3 \neq 0$$
+]
+
+---
+
+### Hypothesis testing
+
+.large[
+$$Y_i \sim Bernoulli(\pi_i)$$
+
+\begin{align}
+\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) &= \beta_0 + \beta_1 \ Temperature_i + \beta_2 \ Abdominal_i \\ 
+& \hspace{0.5cm} + \beta_3 \ Temperature_i \cdot Abdominal_i
+\end{align}
+]
+
+.large[
+**Hypotheses:**
+
+$$H_0: \beta_2 = \beta_3 = 0$$
+
+$$H_A: \text{at least one of } \beta_2, \beta_3 \neq 0$$
+]
+
+.large[
+.question[
+Which type of test can I use to test these hypotheses ($z$-test, likelihood ratio test, or either)?
+]
+]
+
+---
+
+### Hypothesis testing
+
+.large[
+$$Y_i \sim Bernoulli(\pi_i)$$
+
+\begin{align}
+\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) &= \beta_0 + \beta_1 \ Temperature_i + \beta_2 \ Abdominal_i \\ 
+& \hspace{0.5cm} + \beta_3 \ Temperature_i \cdot Abdominal_i
+\end{align}
+]
+
+.large[
+**Hypotheses:**
+
+$$H_0: \beta_2 = \beta_3 = 0$$
+
+$$H_A: \text{at least one of } \beta_2, \beta_3 \neq 0$$
+]
+
+.large[
+We will use a likelihood ratio test, since we are testing multiple parameters at once.
+]
+
+---
+
+### Likelihood ratio test
+
+.large[
+$$Y_i \sim Bernoulli(\pi_i)$$
+
+\begin{align}
+\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) &= \beta_0 + \beta_1 \ Temperature_i + \beta_2 \ Abdominal_i \\ 
+& \hspace{0.5cm} + \beta_3 \ Temperature_i \cdot Abdominal_i
+\end{align}
+]
+
+.large[
+**Hypotheses:**
+
+$$H_0: \beta_2 = \beta_3 = 0$$
+
+$$H_A: \text{at least one of } \beta_2, \beta_3 \neq 0$$
+]
+
+.large[
+.question[
+What are my full and reduced models?
+]
+]
+
+---
+
+### Full and reduced models
+
+.large[
+**Full model:**
+
+\begin{align}
+\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) &= \beta_0 + \beta_1 \ Temperature_i + \beta_2 \ Abdominal_i \\ 
+& \hspace{0.5cm} + \beta_3 \ Temperature_i \cdot Abdominal_i
+\end{align}
+
+**Reduced model:**
+
+$$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \ Temperature_i$$
+]
+
+---
+
+### Test statistic
+
+.large[
+$$G = \text{deviance of full model } - \text{deviance of reduced model}$$
+]
+
+.large[
+**Full model:**
+
+```{r echo=F, output.lines = 12:13}
+glm(Dengue ~ Temperature*Abdominal, family=binomial, data=dengue)
+```
+]
+
+.large[
+**Reduced model:**
+
+```{r echo=F, output.lines = 9:10}
+glm(Dengue ~ Temperature, family=binomial, data=dengue)
+```
+]
+
+.large[
+$$G = 6927 - 6914 = 13$$
+.question[
+How do I calculate a p-value for this test statistic?
+]
+]
+
+---
+
+### p-value
+
+.large[
+$$G = 6927 - 6914 = 13 \hspace{1cm} G \sim \chi^2_k$$
+where $k =$ difference in number of parameters between full and reduced models.
+
+.question[
+What is $k$ for this test?
+]
+]
+
+--
+
+.large[
+$H_0: \beta_2 = \beta_3 = 0$, so $k = 2$
+
+```{r}
+pchisq(13, df=2, lower.tail=F)
+```
+]
+
+---
+
+### Conclusion
+
+.large[
+* **Question:** Is there a relationship between abdominal pain and the probability of dengue, after accounting for the relationship between temperature and the probability of dengue?
+* **Hypotheses:**
+$$H_0: \beta_2 = \beta_3 = 0$$
+
+$$H_A: \text{at least one of } \beta_2, \beta_3 \neq 0$$
+* **p-value:** 0.0015
+* **Conclusion:** There is strong evidence that there is a relationship between abdominal pain and the probability of dengue, after accounting for the relationship between temperature and the probability of dengue.
+]
+
+---
+
+### A new question...
+
+.large[
+You report your results to the hospital, and they ask a follow-up question: 
+
+*Does the model improve when we add hematocrit (the proportion of red blood cells)?*
+]
+
+---
+
+### Exploratory data analysis
+
+```{r echo=F, message=F, warning=F, fig.width=9, fig.height=5, fig.align='center'}
+logodds_plot(dengue, 10, "equal_size", x = "HCT", y = "Dengue",
+             grouping = "Abdominal")
+```
+
+.large[
+.question[
+Does it look like we need an interaction between hematocrit (HCT) and abdominal pain?
+]
+]
+
+---
+
+### Exploratory data analysis
+
+```{r echo=F, message=F, warning=F, fig.width=9, fig.height=5, fig.align='center'}
+logodds_plot(dengue, 10, "equal_size", x = "HCT", y = "Dengue",
+             grouping = "Abdominal")
+```
+
+.large[
+.question[
+How can I check whether there might be an interaction between temperature and hematocrit?
+]
+]
+
+---
+
+### Exploratory data analysis
+
+.large[
+Define $TempHigh$ by 
+* $TempHigh_i = 1$ if $Temperature_i > 38$
+* $TempHigh_i = 0$ if $Temperature_i <= 38$
+]
+
+```{r echo=F, message=F, warning=F, fig.width=9, fig.height=5, fig.align='center'}
+dengue %>%
+  mutate(TempHigh = as.factor((Temperature > 38) + 0)) %>%
+  logodds_plot(10, "equal_size", x = "HCT", y = "Dengue",
+             grouping = "TempHigh")
+```
+
+---
+
+### Exploratory data analysis
+
+```{r echo=F, message=F, warning=F, fig.width=9, fig.height=5, fig.align='center'}
+dengue %>%
+  mutate(TempHigh = as.factor((Temperature > 38) + 0)) %>%
+  logodds_plot(10, "equal_size", x = "HCT", y = "Dengue",
+             grouping = "TempHigh")
+```
+
+.large[
+.question[
+Does it look like we need an interaction between temperature and hematocrit?
+]
+]
+
+---
+
+### Model
+
+.large[
+$$Y_i \sim Bernoulli(\pi_i)$$
+]
+
+.large[
+\begin{align}
+\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) &= \beta_0 + \beta_1 \ Temperature_i + \beta_2 \ Abdominal_i \\
+& \hspace{0.5cm} + \beta_3 \ Temperature_i \cdot Abdominal_i \\
+& \hspace{0.5cm} + \beta_4 \ HCT_i
+\end{align}
+]
+
+.large[
+* Note that while we binarized temperature for EDA, we use the original variable in the model here
+]
+
+---
+
+### Class activity, Part II
+
+---
+
+### Class activity
+
+.large[
+.question[
+What is the estimated change in odds associated with a 1 point increase in hematocrit, holding temperature and abdominal pain constant?
+]
+]
+
+--
+
+.large[
+$\widehat{\beta}_4 = 0.115$
+
+So we estimate that a 1 point increase in hematocrit is associated with an increase in the odds of dengue by a factor of $e^{0.115} = 1.12$
+]
+
+---
+
+### Class activity
+
+.large[
+.question[
+How does the deviance change when we add hematocrit to the model?
+]
+]
+
+--
+
+.large[
+It will decrease -- we can always decrease the deviance by adding more terms.
+
+Indeed, the deviance decreases from 6914 to 6745.
+]
+
+---
+
+### Comparing models
+
+.large[
+If deviance always decreases when I add additional variables, how can I assess whether including hematocrit substantially improves the model?
+
+**Option 1:** Likelihood ratio test
+* Is the change in deviance bigger than we would expect if hematocrit doesn't really matter?
+]
+
+---
+
+### Likelihood ratio test
+
+.large[
+\begin{align}
+\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) &= \beta_0 + \beta_1 \ Temperature_i + \beta_2 \ Abdominal_i \\
+& \hspace{0.5cm} + \beta_3 \ Temperature_i \cdot Abdominal_i \\
+& \hspace{0.5cm} + \beta_4 \ HCT_i
+\end{align}
+]
+
+.large[
+**Hypotheses:** 
+
+$$H_0: \beta_4 = 0 \hspace{1cm} H_A: \beta_4 \neq 0$$
+**Test statistic:**
+
+$$G = \text{deviance for reduced model } - \text{deviance for full model}$$
+]
+
+---
+
+### Likelihood ratio test
+
+.large[
+$$G = 6914 - 6745 = 169 \hspace{1cm} G \sim \chi^2_k$$
+
+$k = \ ?$
+]
+
+---
+
+### Likelihood ratio test
+
+.large[
+$$G = 6914 - 6745 = 169 \hspace{1cm} G \sim \chi^2_k$$
+
+$k =$ difference in number of parameters $= 1$
+
+```{r}
+pchisq(169, df=1, lower.tail = F)
+```
+]
+
+---
+
+### Comparing models
+
+.large[
+If deviance always decreases when I add additional variables, how can I assess whether including hematocrit substantially improves the model?
+
+**Option 1:** Likelihood ratio test
+* Is the change in deviance bigger than we would expect if hematocrit doesn't really matter?
+
+**Option 2:** AIC
+]
+
+---
+
+### AIC
+
+.large[
+.question[
+In linear regression, what quantity did we use to compare models with different numbers of parameters?
+]
+]
+
+--
+
+.large[
+*Adjusted $R^2$*
+
+* We can use something similar for logistic regression, called the *Akaike information criterion* (AIC)
+* Motivation: penalize the deviance based on the number of parameters
+]
+
+---
+
+### AIC
+
+.large[
+**AIC:** Suppose our model has $p$ parameters (including the intercept). Then the AIC is
+$$AIC = 2p + \text{deviance}$$
+]
+
+.large[
+* Penalize deviance based on the number of parameters
+* Is the reduction in deviance worth adding more parameters to the model?
+* We prefer a smaller AIC
+]
+
+---
+
+### AIC
+
+.large[
+**Model 1:** (adding hematocrit)
+
+```{r echo=F, output.lines = 12:13}
+glm(Dengue ~ Temperature*Abdominal + HCT, family=binomial, data=dengue)
+```
+]
+
+.large[
+**Model 2:** (no hematocrit)
+
+```{r echo=F, output.lines = 12:13}
+glm(Dengue ~ Temperature*Abdominal, family=binomial, data=dengue)
+```
+]
+
+.large[
+.question[
+Which model do we prefer, based on AIC?
+]
+]
+
+--
+
+.large[
+Model 2
+]
+
+---
+
+### Model comparison
+
+.large[
+*Does the model improve when we add hematocrit (the proportion of red blood cells)?*
+
+* **Likelihood ratio test:** p-value $\approx 0$
+
+* **AIC:** AIC is smaller when we add hematocrit
+
+**Conclusion:** We have convincing evidence that adding hematocrit improves the model.
+]
+
+---
+
+### Next time...
+
+.large[
+* prediction
+* model selection
+]

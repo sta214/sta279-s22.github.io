@@ -1,0 +1,115 @@
+---
+title: "Class Activity, February 4"
+output: 
+  tufte::tufte_html:
+    css: "lab.css"
+    tufte_variant: "envisioned"
+    highlight: pygments
+link-citations: yes
+---
+
+## Setup
+
+In this class activity, we will work with the dengue fever data we have been using in the slides. We have data on 5720 Vietnamese children, admitted to hospital with possible dengue fever. The variables we will use today are:
+
+* `Dengue`: whether the patient actually has dengue fever, based on a lab test (0 = no, 1 = yes)
+* `Temperature`: patient's body temperature (in Celsius)
+* `Abdominal`: whether the patient has abdominal pain (0 = no, 1 = yes)
+* `HCT`: patient's hematocrit (proportion of red blood cells)
+
+# Part I
+
+Letting $Y_i = 1$ if patient $i$ has dengue, and 0 otherwise, our model is
+
+$$Y_i \sim Bernoulli(\pi_i)$$
+\begin{align}
+\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) &= \beta_0 + \beta_1 \ Temperature_i + \beta_2 \ Abdominal_i \\ & \hspace{0.5cm} + \beta_3 \ Temperature_i \cdot Abdominal_i
+\end{align}
+
+We fit this model in R, which produces the following output:
+
+```{r, include=F}
+library(tidyverse)
+library(knitr)
+
+hook_output <- knit_hooks$get("output")
+knit_hooks$set(output = function(x, options) {
+   lines <- options$output.lines
+   if (is.null(lines)) {
+     return(hook_output(x, options))  # pass to default hook
+   }
+   x <- unlist(strsplit(x, "\n"))
+   more <- "..."
+   if (length(lines)==1) {        # first n lines
+     if (length(x) > lines) {
+       # truncate the output, but add ....
+       #x <- c(head(x, lines), more)
+       x <- c(head(x, lines))
+     }
+   } else {
+     #x <- c(more, x[lines], more)
+     x <- c(x[lines])
+   }
+   # paste these lines together
+   x <- paste(c(x, ""), collapse = "\n")
+   hook_output(x, options)
+ })
+
+dengue_original <- read.csv("../slides/dengue_original.csv")
+
+dengue <- dengue_original %>%
+  select(SiteNo, Sex, Age, DayDisease, Vomiting, Abdo, Muco, Skin,
+         Temp, BMI, Height, Weight, Flush, Rash, WBC, HCT, PLT, 
+         NS1_TRIP, Lab_Confirmed_Dengue) %>%
+  rename(SiteNumber = SiteNo, 
+         DiseaseDay = DayDisease,
+         Abdominal = Abdo,
+         Mucosal = Muco,
+         Temperature = Temp, 
+         RapidTest = NS1_TRIP,
+         Dengue = Lab_Confirmed_Dengue) %>%
+  mutate(Vomiting = as.factor(2 - Vomiting),
+         Abdominal = as.factor(2 - Abdominal),
+         Mucosal = as.factor(2 - Mucosal),
+         Skin = as.factor(2 - Skin),
+         Flush = as.factor(2 - Flush),
+         Rash = as.factor(2 - Rash),
+         RapidTest = ifelse(RapidTest == 1, "positive", "negative"),
+         Dengue = 2 - Dengue,
+         Sex = ifelse(Sex == 1, "male", "female")) %>% 
+  drop_na()
+```
+
+```{r, output.lines=10:22}
+dengue_glm1 <- glm(Dengue ~ Temperature*Abdominal, family = binomial, data = dengue)
+summary(dengue_glm1)
+```
+
+1. What is the estimated probability of dengue for a patient with a temperature of 38C and abdominal pain?
+
+2. For patients with abdominal pain, what is the estimated change in odds associated with an increase in temperature of 1C?
+
+3. Suppose I want to test whether there is a relationship between abdominal pain and the probability of dengue, after accounting for the relationship between temperature and the probability of dengue. Write down null and alternative hypotheses for this test, in terms of one or more model parameters.
+
+<br/>
+
+# Part II
+
+We now add hematocrit (HCT) to the model:
+
+$$Y_i \sim Bernoulli(\pi_i)$$
+
+\begin{align}
+\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) &= \beta_0 + \beta_1 \ Temperature_i + \beta_2 \ Abdominal_i \\
+& \hspace{0.5cm} + \beta_3 \ Temperature_i \cdot Abdominal_i \\
+& \hspace{0.5cm} + \beta_4 \ HCT_i
+\end{align}
+
+```{r, output.lines=10:23}
+dengue_glm2 <- glm(Dengue ~ Temperature*Abdominal + HCT, family = binomial, data = dengue)
+summary(dengue_glm2)
+```
+
+4. What is the estimated change in odds associated with a 1 point increase in hematocrit, holding temperature and abdominal pain constant?
+
+5. How does the deviance change when we add hematocrit to the model?
