@@ -268,7 +268,7 @@ $$Y_i \sim Bernoulli(\pi_i)$$
 ### Class activity, Part I
 
 .large[
-[https://sta279-s22.github.io/class_activities_ca_lecture_10.html](https://sta279-s22.github.io/class_activities_ca_lecture_10.html)
+[https://sta279-s22.github.io/class_activities/ca_lecture_10.html](https://sta279-s22.github.io/class_activities/ca_lecture_10.html)
 ]
 
 ---
@@ -618,7 +618,7 @@ $$Y_i \sim Bernoulli(\pi_i)$$
 ### Class activity, Part II
 
 .large[
-[https://sta279-s22.github.io/class_activities_ca_lecture_10.html](https://sta279-s22.github.io/class_activities_ca_lecture_10.html)
+[https://sta279-s22.github.io/class_activities/ca_lecture_10.html](https://sta279-s22.github.io/class_activities/ca_lecture_10.html)
 ]
 
 ---
