@@ -456,7 +456,7 @@ $$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \ Temperature
 ### Test statistic
 
 .large[
-$$G = \text{deviance of full model } - \text{deviance of reduced model}$$
+$$G = \text{deviance of reduced model } - \text{deviance of full model}$$
 ]
 
 .large[
