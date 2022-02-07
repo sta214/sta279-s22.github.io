@@ -1,14 +1,15 @@
 ---
-title: Beginning multinomial regression
+title: Multiple logistic regression
 ---
 
 February 7
-: **Lab**{: .label .label-purple } Lab 3
+: Multiple logistic regression
+  : [Slides](https://sta279-s22.github.io/slides/lecture_10.html), [Class activity](https://sta279-s22.github.io/class_activities/ca_lecture_10.html)
+  
+: Textbook 6.7
 
 February 9
-: **Exam 1**{: .label .label-red }
+: Multiple logistic regression, prediction
 
 February 11
-: Beginning multinomial regression
-
-: **Project 1**{: .label .label-green }
+: **Lab**{: .label .label-purple } Lab 3

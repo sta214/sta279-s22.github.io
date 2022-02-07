@@ -1,5 +1,5 @@
 ---
-title: "Class Activity, February 4"
+title: "Class Activity, February 7"
 output: 
   tufte::tufte_html:
     css: "lab.css"
