@@ -15,9 +15,12 @@ editor_options:
 ### Agenda
 
 .large[
+* Faculty research presentations
+  * Friday, February 11, 3pm (Carswell 101)
 * Exam 1
   * Wednesday February 16, in class
   * Covers material up through today (inclusive)
+  * Closed notes
   * Bring a calculator (cannot use phone or laptop)
   * I won't ask you to write R code, but you may need to interpret R output
   * Questions similar to assignments and class activities
