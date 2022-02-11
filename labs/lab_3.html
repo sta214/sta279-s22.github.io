@@ -225,7 +225,7 @@
 <p>When you are done with the lab, submit your knitted HTML file to Canvas. For Part II, you may submit a separate scan of your written work, if you prefer.</p>
 <div id="data" class="section level1">
 <h1>Data</h1>
-<p>Dengue fever is a mosquito-borne viral disease, which infects hundreds of millions of people a year, particularly in tropical climates. There are two different lab tests available for detecting dengue: a gold-standard test, which may be time consuming or expensive to run, and a rapid test which provides quicker results but isn’t perfectly accurate. Researchers in Vietnam are interested in creating a new way to diagnose dengue: by building a logistic regression model that predicts the probability and individual has dengue based on standard diagnostic tools like their temperature, BMI, and white blood cell count.</p>
+<p>Dengue fever is a mosquito-borne viral disease, which infects hundreds of millions of people a year, particularly in tropical climates. There are two different lab tests available for detecting dengue: a gold-standard test, which may be time consuming or expensive to run, and a rapid test which provides quicker results but isn’t perfectly accurate. Researchers in Vietnam are interested in creating a new way to diagnose dengue: by building a logistic regression model that predicts the probability an individual has dengue based on standard diagnostic tools like their temperature, BMI, and white blood cell count.</p>
 <p>We have data on 5720 Vietnamese children, admitted to hospital with possible dengue fever. Variables include:</p>
 <ul>
 <li><code>SiteNumber</code>: The hospital at which the data was recorded</li>
@@ -386,7 +386,7 @@
 </div>
 <div id="question-7" class="section level4 question">
 <h4>Question 7</h4>
-<p>Based on your investigations in questions 1 – 6, fit a logistic regression model to predict the probability an individual has dengue, with WBC, HCT, and PLT as predictors.</p>
+<p>Based on your investigations in questions 1 – 6, fit a logistic regression model to predict the probability an individual has dengue, with WBC, HCT, and PLT as predictors. Write the equation of the fitted regression line.</p>
 </div>
 <div id="question-8" class="section level4 question">
 <h4>Question 8</h4>
@@ -395,6 +395,57 @@
 </div>
 <div id="prediction" class="section level2">
 <h2>Prediction</h2>
+<p>Now let’s look at our model’s prediction performance. We will use a threshold on our predicted probabilities, and then compare our predictions to the true dengue status with a confusion matrix.</p>
+<p>If <code>dengue_glm</code> is the name of our fitted model in R, then the following code will make a confusion matrix with a threshold of 0.5.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>preds <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">predict</span>(dengue_glm, <span class="at">type=</span><span class="st">&quot;response&quot;</span>) <span class="sc">&gt;</span> <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="st">&quot;prediction&quot;</span> <span class="ot">=</span> preds, <span class="st">&quot;truth&quot;</span> <span class="ot">=</span> dengue<span class="sc">$</span>Dengue)</span></code></pre></div>
+<p>For reference, the confusion matrix for the rapid test is</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th></th>
+<th>Actual</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><span class="math inline">\(Y = 0\)</span></td>
+<td><span class="math inline">\(Y = 1\)</span></td>
+</tr>
+<tr class="even">
+<td><strong>Predicted</strong></td>
+<td><span class="math inline">\(\widehat{Y} = 0\)</span></td>
+<td>3990</td>
+<td>503</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><span class="math inline">\(\widehat{Y} = 1\)</span></td>
+<td>33</td>
+<td>1194</td>
+</tr>
+</tbody>
+</table>
+<div id="question-9" class="section level4 question">
+<h4>Question 9</h4>
+<p>Calculate the accuracy for our predictions, using a threshold of 0.5. How does our model compare to the rapid test?</p>
+</div>
+<p>Of course, accuracy is just one measure of prediction performance, and can be misleading. Two other ways we can measure performance, which are often used together, are <em>sensitivity</em> (true positive rate) and <em>specificity</em> (true negative rate).</p>
+<p><span class="math inline">\(\text{sensitivity} = \dfrac{\text{number of true positives}}{\text{number of true positives + number of false negatives}}\)</span></p>
+<p><span class="math inline">\(\text{specificity} = \dfrac{\text{number of true negatives}}{\text{number of true negatives + number of false positives}}\)</span></p>
+<p>For the rapid test, using the confusion matrix above, the sensitivity is <span class="math inline">\(1194/(1194 + 503)\)</span>, and the specificity is <span class="math inline">\(3990/(3990 + 33)\)</span>.</p>
+<div id="question-10" class="section level4 question">
+<h4>Question 10</h4>
+<p>Calculate sensitivity and specificity for our model with a threshold of 0.5, and compare against the rapid test.</p>
+</div>
+<div id="question-11" class="section level4 question">
+<h4>Question 11</h4>
+<p>Try a few different thresholds other than 0.5. How do sensitivity and specificity change when we increase the threshold? When we decrease the threshold?</p>
+</div>
 </div>
 </div>
 <div id="part-ii-maximum-likelihood-estimation" class="section level1">
@@ -405,14 +456,14 @@
 <p>For now, let’s assume that <span class="math inline">\(\sigma^2 = 1\)</span>. Then, it turns out that the likelihood for parameter estimates <span class="math inline">\(\widehat{\beta}_0\)</span> and <span class="math inline">\(\widehat{\beta}_1\)</span> is</p>
 <p><span class="math display">\[L(\widehat{\beta}_0, \widehat{\beta}_1) \propto \prod \limits_{i=1}^n \exp \{ - \dfrac{1}{2}(Y_i - \widehat{\beta}_0 - \widehat{\beta}_1 X_i)^2 \}\]</span></p>
 <p>(where <span class="math inline">\(\propto\)</span> means “proportional to”, i.e. equal up to a constant multiple).</p>
-<div id="question-9" class="section level4 question">
-<h4>Question 9</h4>
+<div id="question-12" class="section level4 question">
+<h4>Question 12</h4>
 <p>Based on the likelihood above, calculate the log likelihood, and show that the deviance is equivalent to the sum of the squared residuals (SSE).</p>
 </div>
 <p>It turns out we can maximize the likelihood by hand, but it is a little complicated. To make it simpler, let’s ignore the predictor <span class="math inline">\(X\)</span>, so we just have the parameter <span class="math inline">\(\beta_0\)</span> and the likelihood is</p>
 <p><span class="math display">\[L(\widehat{\beta}_0) \propto \prod \limits_{i=1}^n \exp \{ - \dfrac{1}{2}(Y_i - \widehat{\beta}_0 )^2 \}\]</span></p>
-<div id="question-10" class="section level4 question">
-<h4>Question 10</h4>
+<div id="question-13" class="section level4 question">
+<h4>Question 13</h4>
 <p>Show that the maximum likelihood estimate is <span class="math inline">\(\widehat{\beta}_0 = \dfrac{1}{n} \sum \limits_{i=1}^n Y_i\)</span>.</p>
 </div>
 </div>

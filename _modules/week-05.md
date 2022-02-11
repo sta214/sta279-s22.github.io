@@ -18,3 +18,4 @@ February 9
 
 February 11
 : **Lab**{: .label .label-purple } Lab 3
+  : [Slides](https://sta279-s22.github.io/slides/lecture_12.html), [Lab 3](https://sta279-s22.github.io/labs/lab_3.html)

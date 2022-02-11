@@ -17,7 +17,7 @@ When you are done with the lab, submit your knitted HTML file to Canvas. For Par
 
 # Data
 
-Dengue fever is a mosquito-borne viral disease, which infects hundreds of millions of people a year, particularly in tropical climates. There are two different lab tests available for detecting dengue: a gold-standard test, which may be time consuming or expensive to run, and a rapid test which provides quicker results but isn't perfectly accurate. Researchers in Vietnam are interested in creating a new way to diagnose dengue: by building a logistic regression model that predicts the probability and individual has dengue based on standard diagnostic tools like their temperature, BMI, and white blood cell count.
+Dengue fever is a mosquito-borne viral disease, which infects hundreds of millions of people a year, particularly in tropical climates. There are two different lab tests available for detecting dengue: a gold-standard test, which may be time consuming or expensive to run, and a rapid test which provides quicker results but isn't perfectly accurate. Researchers in Vietnam are interested in creating a new way to diagnose dengue: by building a logistic regression model that predicts the probability an individual has dengue based on standard diagnostic tools like their temperature, BMI, and white blood cell count.
 
 We have data on 5720 Vietnamese children, admitted to hospital with possible dengue fever. Variables include:
 
@@ -208,7 +208,7 @@ Modify the code above Question 5 to create empirical log odds plots that explore
 :::{.question}
 #### Question 7
 
-Based on your investigations in questions 1 -- 6, fit a logistic regression model to predict the probability an individual has dengue, with WBC, HCT, and PLT as predictors. 
+Based on your investigations in questions 1 -- 6, fit a logistic regression model to predict the probability an individual has dengue, with WBC, HCT, and PLT as predictors. Write the equation of the fitted regression line.
 :::
 
 :::{.question}
@@ -218,6 +218,50 @@ Calculate the AIC for your model in Question 7. Did adding HCT and PLT to the mo
 :::
 
 ## Prediction
+
+Now let's look at our model's prediction performance. We will use a threshold on our predicted probabilities, and then compare our predictions to the true dengue status with a confusion matrix.
+
+If `dengue_glm` is the name of our fitted model in R, then the following code will make a confusion matrix with a threshold of 0.5.
+
+```r
+preds <- ifelse(predict(dengue_glm, type="response") > 0.5, 1, 0)
+table("prediction" = preds, "truth" = dengue$Dengue)
+```
+
+For reference, the confusion matrix for the rapid test is
+
+| | | Actual | |
+| --- | --- | --- | --- |
+| | | $Y = 0$ | $Y = 1$ |
+|**Predicted** | $\widehat{Y} = 0$ | 3990 | 503 |
+| | $\widehat{Y} = 1$ | 33 | 1194 |
+
+:::{.question}
+#### Question 9
+
+Calculate the accuracy for our predictions, using a threshold of 0.5. How does our model compare to the rapid test?
+:::
+
+Of course, accuracy is just one measure of prediction performance, and can be misleading. Two other ways we can measure performance, which are often used together, are *sensitivity* (true positive rate) and *specificity* (true negative rate).
+
+$\text{sensitivity} = \dfrac{\text{number of true positives}}{\text{number of true positives + number of false negatives}}$
+
+$\text{specificity} = \dfrac{\text{number of true negatives}}{\text{number of true negatives + number of false positives}}$
+
+For the rapid test, using the confusion matrix above, the sensitivity is $1194/(1194 + 503)$, and the specificity is $3990/(3990 + 33)$.
+
+:::{.question}
+#### Question 10
+
+Calculate sensitivity and specificity for our model with a threshold of 0.5, and compare against the rapid test.
+:::
+
+:::{.question}
+#### Question 11
+
+Try a few different thresholds other than 0.5. How do sensitivity and specificity change when we increase the threshold? When we decrease the threshold?
+:::
+
 
 # Part II: Maximum likelihood estimation
 
@@ -234,7 +278,7 @@ $$L(\widehat{\beta}_0, \widehat{\beta}_1) \propto \prod \limits_{i=1}^n \exp \{ 
 (where $\propto$ means "proportional to", i.e. equal up to a constant multiple).
 
 :::{.question}
-#### Question 9
+#### Question 12
 
 Based on the likelihood above, calculate the log likelihood, and show that the deviance is equivalent to the sum of the squared residuals (SSE).
 :::
@@ -244,7 +288,7 @@ It turns out we can maximize the likelihood by hand, but it is a little complica
 $$L(\widehat{\beta}_0) \propto \prod \limits_{i=1}^n \exp \{ - \dfrac{1}{2}(Y_i - \widehat{\beta}_0 )^2 \}$$
 
 :::{.question}
-#### Question 10
+#### Question 13
 
 Show that the maximum likelihood estimate is $\widehat{\beta}_0 = \dfrac{1}{n} \sum \limits_{i=1}^n Y_i$.
 :::
