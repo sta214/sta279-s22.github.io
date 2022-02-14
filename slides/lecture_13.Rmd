@@ -1,0 +1,63 @@
+---
+title: Project 1
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+### Agenda
+
+.large[
+* Exam 1 on Wednesday, in class
+  * Closed notes
+  * Bring a calculator
+* Lab 3 due Friday
+* Project 1 released, due Feb. 25
+* Today:
+  * Overview of project 1
+  * Time to work on Lab 3 or start project 1
+]
+
+---
+
+### Project 1
+
+.large[
+**Data:** A random sample of 20,000 people from the Behavioral Risk Factor Surveillance System (BRFSS) survey, an annual telephone survey designed to identify risk factors in the adult population and report emerging health trends.
+
+**Research questions:**
+
+* Is there a relationship between how much weight someone wants to lose, and the probability that they exercise regularly, after accounting for their age, general health, and health coverage?
+* How well can we predict whether a patient exercises regularly, using other variables in the data?
+
+]
+
+---
+
+### Project format
+
+.large[
+A written report containing:
+* Abstract (short overview of your work)
+* Introduction (motivate and summarize data and research questions)
+* Data (data details and EDA)
+* Modeling (fit and use logistic regression to address the research questions)
+* Discussion (summarize and discuss your results)
+]
+
+---
+
+### Advice
+
+.large[
+* Start early, and knit often
+* Most of your time will probably be spent on EDA and choosing models
+* Add fitted models and figures to your report as you make them, then fill in the writing at the end
+]
