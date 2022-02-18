@@ -1,0 +1,46 @@
+---
+title: "Lab 2, Question 11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+
+titanic <- read.csv("https://sta279-s22.github.io/labs/Titanic.csv")
+
+titanic <- titanic %>%
+  drop_na()
+```
+
+```{r}
+titanic_glm <- glm(Survived ~ log(Fare + 1), 
+                   family=binomial, data = titanic)
+summary(titanic_glm)
+```
+
+### Hypotheses
+
+We want to test whether there is a positive relationship between passenger fare and the probability of survival. I chose to use a log transformation on Fare (adding 1 to Fare before transforming because some passengers fares were 0 in the data). A positive relationship between passenger fare and the probability of survival is equivalent to a positive relationship between log(Fare + 1) and the probability of survival. So, our hypotheses are
+
+$H_0: \beta_1 = 0 \hspace{0.5cm} H_A: \beta_1 > 0$
+
+### Test
+
+Because our alternative is one-sided, *we cannot use a likelihood ratio test here*. We have to use a Wald test.
+
+### Test statistic
+
+Our test statistic is $z = \dfrac{\widehat{\beta}_1 - 0}{SE_{\widehat{\beta}_1}} = 0.8089/0.0942 = 8.587$ (where $\widehat{\beta}_1$ and $SE_{\widehat{\beta}_1}$ are taken from the summary R output above).
+
+### p-value
+
+Remember that the p-value R reports in the summary output for the *two-sided alternative* $\beta_1 \neq 0$. Because we have a different alternative hypothesis, this p-value isn't correct.
+
+Here we could either divide the p-value R reports by 2, or calculate it ourself. Let's calculate it ourself:
+
+```{r}
+pnorm(8.587, lower.tail=F)
+```
+
+So the p-value is approximately 0. Therefore, we have strong evidence that there is a positive relationship between passenger fare and the probability of survival.

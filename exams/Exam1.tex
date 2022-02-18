@@ -1,0 +1,321 @@
+\documentclass[11pt]{article}
+\usepackage[top=2cm,bottom=2cm,left=1.75cm,right= 1.75cm]{geometry}
+%\geometry{landscape}                % Activate for for rotated page geometry
+\usepackage[parfill]{parskip}    % Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{hyperref}
+%\usepackage{changepage}
+\usepackage{lscape}
+%\usepackage{ulem}
+\usepackage{multicol}
+\usepackage{setspace}
+\usepackage{dashrule}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{enumerate}
+\usepackage{enumitem}
+\newcommand{\urlwofont}[1]{\urlstyle{same}\url{#1}}
+\newcommand{\degree}{\ensuremath{^\circ}}
+\newcommand{\hl}[1]{\textbf{\underline{#1}}}
+\newcommand\given[1][]{\:#1\vert\:}
+
+% footnote citation
+\usepackage[style=authortitle-ibid, maxnames=3,natbib=true,sortcites=true,block=space]{biblatex}
+\bibliography{final}
+
+% color hyperlinks
+%\usepackage[colorlinks=false,pdfborder={0 0 0},urlcolor= MidnightBlue,colorlinks=true,linkcolor= MidnightBlue, citecolor= MidnightBlue,backref=true]{hyperref}
+
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\newenvironment{choices}{
+\begin{enumerate}[(a)]
+}{\end{enumerate}}
+
+%\newcommand{\soln}[2]{\textcolor{MidnightBlue}{\textit{#2}}}{} 		% solutions
+\newcommand{\soln}[2]{\vspace{#1}}{}						% exam, handout, etc.
+
+%\newcommand{\solnMult}[1]{\textbf{\textcolor{MidnightBlue}{\textit{#1}}}}	% uncomment for solutions
+\newcommand{\solnMult}[1]{ #1 }	% uncomment for handouts
+
+%\newcommand{\tf}[1]{ \textbf{\textcolor{MidnightBlue}{\textit{#1}}} }	% uncomment for solutions
+\newcommand{\tf}[1]{}	% uncomment for handouts
+
+%\newcommand{\pts}[1]{ \textbf{{\small \textcolor{BurntOrange}{(#1)}}} }	% uncomment for solutions
+\newcommand{\pts}[1]{ \textbf{{\small \textcolor{black}{(#1)}}} }	% uncomment for handouts
+
+\newcommand{\note}[1]{ \textbf{\textcolor{red}{[#1]}} }	% uncomment for handouts
+
+\newcommand{\qt}[1]{\textcolor{RoyalBlue}{\textbf{\textit{#1.}}}}
+
+\renewcommand{\emph}[1]{\underline{\textbf{#1}}}
+
+\newcommand{\reference}[1]{ \textbf{\textcolor{red}{[#1]}} }
+
+%\newcommand{\fb}[3]{
+%  \textcolor{NavyBlue}{\textbf{Question Feedback:} #1} \\$\:$\\
+%  \textcolor{NavyBlue}{\textbf{This question refers to the following learning objective(s):}\\
+%  \textbf{\textit{#2:}} #3}
+%}
+
+
+\begin{document}
+
+\begin{titlepage}
+
+\enlargethispage{\baselineskip}
+
+
+STA 279 \hfill Dr. Evans \\
+Spring 2022	\hfill Exam 1\\
+
+\vspace{-2cm}
+
+\begin{center}
+{\Huge Exam 1}	
+\end{center}
+
+$\:$ \\
+
+\textbf{Last Name:} \rule{5cm}{0.5pt}	\hfill	 \textbf{First Name:}  \rule{5cm}{0.5pt}	 \\
+$\:$ \\
+%\textbf{Section:} A (11 AM) $\quad$ B (9:30 AM) \hfill	
+%\textbf{Team Name:}  \rule{7cm}{0.5pt} \\
+$\:$ \\
+
+\textit{I hereby state that I have not communicated with or gained information in any way from other students or any outside resource during this exam. I agree to abide by the rules stated below, and to abide by the Wake Forest Honor Code. All work is my own. I understand that any violation of this agreement will be reported to the Honor Council and will result, at minimum, in a 0 on this exam.}
+\[ Signature: \rule{7cm}{0.5pt}\]
+
+\hdashrule[0.5ex]{\textwidth}{0.5pt}{3mm}
+
+\textbf{All work on this exam must be your own.}
+
+{\small
+\begin{enumerate}
+\item You have 50 minutes to complete the exam.
+\item Show all your work on the open ended questions in order to get partial credit. No credit will be given for open ended questions where no work is shown, even if the answer is correct.
+\item You are allowed a calculator, however you may not share a calculator with another student during the exam. The calculator must be only a calculator, and may not be connected to the internet. 
+\item You are allowed to ask clarification questions to me, but you may not ask anyone else. 
+\item You are \hl{not} allowed a cell phone, even if you intend to use it as a calculator or for checking the time. You are \hl{not} allowed a music device or headphones, notes, books, or other resources. 
+\item You may \hl{not} communicate with anyone other than myself during the exam.
+\item Write clearly and be clear. Make it easy to find your answers. 
+\end{enumerate}
+}
+\begin{center}
+{\Large Good luck!}
+\end{center}
+\hdashrule[0.5ex]{\textwidth}{0.5pt}{3mm}
+
+%\begin{center}
+%\includegraphics[width=0.5\textwidth]{../figures/bubbles_new}
+%\end{center}
+
+
+
+\end{titlepage}
+
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+$\:$ \\
+\thispagestyle{empty}
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setcounter{page}{1}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\rule{\textwidth}{1pt}
+%\begin{center}
+%\textit{Answer questions \ref{DriveStart} to \ref{DriveEnd} based on the information %below.} \\
+%\end{center}
+\rule{\textwidth}{0.5pt}
+
+\textbf{The Data} We have a client who is interested in examining a recent advertising campaign for DoorDash, a popular food service in which food from restaurants is picked up and delivered to your door. The client wants to examine the relationship between exposure to advertising and the use of the service at a local university. They have data on 1500 randomly selected students from this university, and the data were collected during the month of September when the campaign was active. 
+
+We have information on X = the amount of exposure a student has to the ad campaign  during the month (measured in minutes, between 0 to 6 minutes. Decimals are permitted for values less than a whole minute) and Y = whether or not the student makes a purchase using DoorDash during the same month ( 0 = no, 1 = yes).
+
+\rule{\textwidth}{1pt}
+
+\begin{enumerate}
+
+\item Based on the information we have so far, write down a population model you would suggest the client consider to model the desired relationship. Use appropriate notation. 
+
+
+
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+We create an empirical log odds plot to check the shape assumption, and you may assume all conditions for modeling are met. The client fits the model and obtains the following output: 
+
+\textbf{Model 1} 
+
+\begin{center}
+\begin{tabular}{rrrrr}
+  \hline
+             & Estimate & Std. Error \\
+  \hline
+(Intercept)    & -0.21 & .12    \\
+ AdExposure    & 0.26 & .08 \\
+  \hline
+  & & \\ 
+  Null Deviance : & 649.12 &  on 1499 degrees of freedom \\
+  Residual Deviance : & 568.84 &   on 1498 degrees of freedom \\
+\end{tabular}
+\end{center}
+
+\rule{\textwidth}{1pt}
+
+\item Based on the output above, write down the equation of the fitted model. 
+
+
+
+\vspace{5cm} 
+
+
+\item Interpret the slope in terms of the odds. 
+
+
+\pagebreak
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Now a second client provides us data on whether or not the students in the study have a job ( 0 = no, 1 = yes). They build Model 2 by starting with Model 1 and then adding job status as explanatory variable. Call this model \textbf{Model 2}. 
+
+\textbf{Model 1} 
+
+\begin{center}
+\begin{tabular}{rrrrr}
+  \hline
+             & Estimate & Std. Error \\
+  \hline
+(Intercept)    & -0.21 & .12    \\
+ AdExposure    & 0.26 & .08 \\
+  \hline
+  & & \\ 
+  Null Deviance : & 649.12 &  on 1499 degrees of freedom \\
+  Residual Deviance : & 568.84 &   on 1498 degrees of freedom \\
+\end{tabular}
+\end{center}
+
+\textbf{Model 2} 
+
+\begin{center}
+\begin{tabular}{rrrrr}
+  \hline
+             & Estimate & Std. Error \\
+  \hline
+(Intercept)    & -0.31 & .15    \\
+ AdExposure    & 0.34 & .11 \\
+ Job           & - .43 & .17 \\ 
+  \hline
+  & & \\ 
+  Null Deviance : & 649.12 &  on 1499 degrees of freedom \\
+  Residual Deviance : & 528.23 &   on 1497 degrees of freedom \\
+\end{tabular}
+\end{center}
+
+\rule{\textwidth}{1pt}
+
+\item Suppose we want to answer the following: ``After accounting for ad exposure, are students with jobs \textbf{more likely} to order from DoorDash?'' Write down null and alternative hypotheses, in terms of one or more parameters in the model, which allow you to answer this research question.
+
+\vspace{3cm}
+
+\item What is the name of the hypothesis test you would use to answer this research question? Calculate the test statistic for this hypothesis test using the output above, and state the name of the distribution you would use to calculate a p-value from this test statistic. (You do not need to calculate the p-value).
+
+
+
+\pagebreak
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\textbf{Model 2} 
+
+\begin{center}
+\begin{tabular}{rrrrr}
+  \hline
+             & Estimate & Std. Error \\
+  \hline
+(Intercept)    & -0.31 & .15    \\
+ AdExposure    & 0.34 & .11 \\
+ Job           & - .43 & .17 \\ 
+  \hline
+  & & \\ 
+  Null Deviance : & 649.12 &  on 1499 degrees of freedom \\
+  Residual Deviance : & 528.23 &   on 1497 degrees of freedom \\
+\end{tabular}
+\end{center}
+
+\rule{\textwidth}{1pt}
+
+\item Interpret the coefficient for job status (Job) in terms of the odds. 
+
+\vspace{3cm}
+
+\item If a student with a job has been exposed to 2.5 minutes of advertising, what is the predicted probability that this student orders from DoorDash? Show all work and round your answer to 2 decimal places. 
+
+
+\pagebreak
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose we are told that we have a certain random variable $Y_i$ with four possible outcomes (A, B, C, D). We have the following data: D, A, B, C, C, A, B, C.
+
+We are told that:
+
+\begin{itemize}
+\item $P(Y_i = A) = 2{\pi}_{D}$
+\item $P(Y_i = B) = 4 {\pi}_{D}$
+\item $P(Y_i = C) = 1 - 7 {\pi}_{D}$
+\item $P(Y_i = D) = \pi_D$. 
+\end{itemize} 
+
+\rule{\textwidth}{1pt}
+
+
+\item Using the method of maximum likelihood, solve for the maximum likelihood estimate of $\pi_{D}$. Show your work.  
+
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\huge{You are done!!! Whooo!!!}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\pagebreak
+
+%\hdashrule[0.5ex]{\textwidth}{0.5pt}{3mm}
+%\begin{center}
+%\renewcommand{\arraystretch}{1.5}
+%\begin{tabular}{| l | c | c | c | c | c | c  || c |}
+%\hline
+%				& 		& 		& 		& 		&	&  	&\\
+%				& Q1-Q3		& Q4-6		& Q7		& Q8-Q10		 & Q11-Q12	 & Q13 & Total	\\
+%\hline
+%Points earned		& \textcolor{white}{xxxxx} &	\textcolor{white}{xxxxx}	& \textcolor{white}{xxxxx}	&	\textcolor{white}{xxxxx}&%\textcolor{white}{xxxxx}	&	\textcolor{white}{xxxxx} &	\textcolor{white}{xxxxx} \\
+%\hline
+%Available points	& 9 		& 12		& 9		& 9		&7 & 4 					& 50 \\
+%\hline
+%\end{tabular}
+
+%\end{center}
+
+\end{document}

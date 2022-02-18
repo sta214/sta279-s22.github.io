@@ -14,4 +14,4 @@ February 16
 : **Exam 1**{: .label .label-red }
 
 February 18
-: Beginning multinomial regression
+: Project 1 work day
