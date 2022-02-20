@@ -1,0 +1,248 @@
+---
+title: "Lab 3 Solutions"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+dengue <- read.csv("https://sta279-s22.github.io/labs/dengue.csv")
+
+logodds_plot <- function(data, num_bins, bin_method,
+                         x, y, grouping = NULL, reg_formula = y ~ x){
+  
+  if(is.null(grouping)){
+    dat <- data.frame(x = data[,x], 
+                      y = data[,y],
+                      group = 1)
+  } else {
+    dat <- data.frame(x = data[,x], 
+                      y = data[,y],
+                      group = data[,grouping])
+  }
+  
+  if(bin_method == "equal_size"){
+    logodds_table <- dat %>%
+      drop_na() %>%
+      arrange(group, x) %>%
+      group_by(group) %>%
+      mutate(obs = y,
+             bin = rep(1:num_bins,
+                       each=ceiling(n()/num_bins))[1:n()]) %>%
+      group_by(bin, group) %>%
+      summarize(mean_x = mean(x),
+                prop = mean(c(obs, 0.5)),
+                num_obs = n()) %>%
+      ungroup() %>%
+      mutate(logodds = log(prop/(1 - prop)))
+  } else {
+    logodds_table <- dat %>%
+      drop_na() %>%
+      group_by(group) %>%
+      mutate(obs = y,
+             bin = cut(x, 
+                       breaks = num_bins,
+                       labels = F)) %>%
+      group_by(bin, group) %>%
+      summarize(mean_x = mean(x),
+                prop = mean(c(obs, 0.5)),
+                num_obs = n()) %>%
+      ungroup() %>%
+      mutate(logodds = log(prop/(1 - prop)))
+  }
+  
+  if(is.null(grouping)){
+    logodds_table %>%
+      ggplot(aes(x = mean_x,
+                 y = logodds)) +
+      geom_point(size=2.5) +
+      geom_smooth(se=F, method="lm", formula = reg_formula) +
+      theme_bw() +
+      labs(x = x,
+           y = "Empirical log odds") +
+      theme(text = element_text(size=25))
+  } else {
+    logodds_table %>%
+      ggplot(aes(x = mean_x,
+                 y = logodds,
+                 color = group,
+                 shape = group)) +
+      geom_point(size=2.5) +
+      geom_smooth(se=F, method="lm", formula = reg_formula) +
+      theme_bw() +
+      labs(x = x,
+           y = "Empirical log odds",
+           color = grouping,
+           shape = grouping) +
+      theme(text = element_text(size=25))
+  }
+  
+}
+```
+
+### Question 1 (2 pts)
+
+```{r}
+logodds_plot(dengue, 20, "equal_size", "WBC", "Dengue")
+```
+
+While a linear relationship is an ok approximation, the relationship appears to be curved.
+
+**Grading:** 1 pt for plot, 1pt for commenting on nonlinearity
+
+### Question 2 (2 pts)
+
+```{r}
+library(gridExtra)
+p1 <- logodds_plot(dengue, 20, "equal_size", "WBC", "Dengue", reg_formula = y~log(x))
+p2 <- logodds_plot(dengue, 20, "equal_size", "WBC", "Dengue", reg_formula = y~poly(x, 2))
+p3 <- logodds_plot(dengue, 20, "equal_size", "WBC", "Dengue", reg_formula = y~poly(x, 3))
+
+grid.arrange(p1, p2, p3, ncol=2)
+```
+
+I think the log transformation looks best here, though the polynomial transformation of order 2 is ok. I might be worried about overfitting with the polynomial transformation of order 3.
+
+**Grading:** 1 pt for plots, 1 point for reasonable commentary (it is ok if their preferred transformation isn't the log transformation)
+
+
+### Question 3 (2 pts)
+
+```{r}
+model1 <- glm(Dengue ~ WBC, family=binomial, data=dengue)
+summary(model1)$aic
+summary(model1)$deviance
+
+model2 <- glm(Dengue ~ log(WBC), family=binomial, data=dengue)
+summary(model2)$aic
+summary(model2)$deviance
+
+model3 <- glm(Dengue ~ poly(WBC, 2), family=binomial, data=dengue)
+summary(model3)$aic
+summary(model3)$deviance
+
+model4 <- glm(Dengue ~ poly(WBC, 3), family=binomial, data=dengue)
+summary(model4)$aic
+summary(model4)$deviance
+```
+
+The log transformation has the smallest AIC, so we would choose the log transformation. The polynomial transformation of order 3 actually has the smallest deviance, but has a higher AIC because it has more terms.
+
+**Grading:** 1 pt for AIC comparison, 1 pt for deviance comparison
+
+### Question 4 (2 pts)
+
+
+```{r}
+logodds_plot(dengue, 20, "equal_size", "PLT", "Dengue", reg_formula = y ~ poly(x, 2))
+```
+
+It looks like a polynomial transformation of order 2 fits best here.
+
+**Grading:** I'm ok with them choosing a different transformation instead. But a linear relationship doesn't seem right.
+
+
+### Question 5 (2 pts)
+
+```{r}
+dengue %>%
+  mutate(log_wbc = log(WBC),
+         PLTHigh = PLT > 250) %>%
+  logodds_plot(20, "equal_size", x = "log_wbc", y = "Dengue",
+               reg_formula = y ~ x, grouping = "PLTHigh")
+```
+
+There may be a small interaction between platelet count and white blood cell count, because the lines have slightly different slopes.
+
+**Grading:** 1 pt for answer, 1 pt for reasoning. Either answer (there is or there isn't an interaction) is acceptable, as long as they explain why.
+
+
+
+### Question 6 (2 pts)
+
+```{r}
+dengue %>%
+  mutate(log_wbc = log(WBC),
+         HCTHigh = HCT > 38) %>%
+  logodds_plot(20, "equal_size", x = "log_wbc", y = "Dengue",
+               reg_formula = y ~ x, grouping = "HCTHigh")
+
+dengue %>%
+  mutate(PLTHigh = PLT > 250) %>%
+  logodds_plot(20, "equal_size", x = "HCT", y = "Dengue",
+               reg_formula = y ~ x, grouping = "PLTHigh")
+```
+
+**Grading:** 1 pt for each plot. It is ok if they use a polynomial transformation on PLT, if PLT is on the x-axis. They just have to have 1 plot with WBC and HCT, and 1 plot with PLT and HCT.
+
+### Question 7 (2 pts)
+
+```{r}
+dengue_glm <- glm(Dengue ~ log(WBC) + I(PLT) + I(PLT^2) + HCT,
+                  family = binomial, data = dengue)
+summary(dengue_glm)
+```
+
+$\log \left( \dfrac{\widehat{\pi_i}}{1 - \widehat{\pi_i}} \right) = 3.332 - 2.079 \log(WBC)_i - 0.0147 PLT_i + 0.00002 PLT_i^2 + 0.05 HCT_i$
+
+**Grading:** Lose 1 point for incorrect notation (e.g., missing subscripts, missing hats, etc.) Any combination of interaction terms is ok here. I didn't put any in, but you certainly could (and you can make a good argument for putting them in based on AIC). However, they need a transformation for both PLT and WBC, otherwise lose 1 point. Lose 1 point if they use a binarized variable (e.g., PLTHigh) instead of the original.
+
+### Question 8 (1 pt)
+
+Yes, the AIC has decreased after adding PLT and HCT.
+
+
+### Question 9 (2 pts)
+
+```{r}
+preds <- ifelse(predict(dengue_glm, type="response") > 0.5, 1, 0)
+table("prediction" = preds, "truth" = dengue$Dengue)
+```
+
+The accuracy of our model is (3655 + 874)/5720 = 0.79. This is a bit lower than the accuracy of the rapid test, which is about 0.91.
+
+**Grading:** Their accuracy might be different from mine, if they fit a different model. That's ok, if they calculate it correctly. 
+
+
+### Question 10 (2 pts)
+
+The sensitivity is 874/(874 + 823) = 0.52. The specificity is 3655/(3655 + 368) = 0.91. Both numbers are lower than the sensitivity and specificity for the rapid test. 
+
+**Grading:** 1 pt for sensitivity, 1 pt for specificity. Their numbers might be different from mine, if they fit a different model. That's ok, if they calculate them correctly from their confusion matrix.
+
+
+### Question 11 (3 pts)
+
+As we increase the threshold, sensitivity decreases and specificity increases. As we decrease the threshold, sensitivity increases and specificity decreases.
+
+
+### Question 12 (2 pts)
+
+The log likelihood is
+
+$\log \left( \prod \limits_{i=1}^n \exp \{ - \dfrac{1}{2}(Y_i - \widehat{\beta}_0 - \widehat{\beta}_1 X_i)^2 \right) = -\frac{1}{2} \sum \limits_{i=1}^n (Y_i - \widehat{\beta}_0 - \widehat{\beta}_1 X_i)^2$
+
+So the deviance ( $-2 \log L$ ) is $\sum \limits_{i=1}^n (Y_i - \widehat{\beta}_0 - \widehat{\beta}_1 X_i)^2$, which is the SSE.
+
+**Grading:** 1 pt for log likelihood, 1 pt for deviance
+
+
+### Question 13 (4 pts)
+
+Since we don't have $\beta_1$ or $X_i$, then the log likelihood is
+
+$-\frac{1}{2} \sum \limits_{i=1}^n (Y_i - \widehat{\beta}_0)^2$
+
+Taking the derivative, we get
+
+$-\frac{1}{2} \sum \limits_{i=1}^n -2(Y_i - \widehat{\beta}_0) = \sum \limits_{i=1}^nY_i - n \widehat{\beta}_0$
+
+We set this equal to 0 and solve for $\widehat{\beta}_0$, which gives
+
+$\widehat{\beta}_0 = \frac{1}{n} \sum \limits_{i=1}^nY_i$
+
+**Grading:** They have to show work to get full credit. 2 pts for taking the derivative, 2 pts for solving for $\widehat{\beta}_0$
+
+
