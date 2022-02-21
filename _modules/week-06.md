@@ -1,5 +1,5 @@
 ---
-title: Beginning multinomial regression
+title: Wrapping up logistic regression
 ---
 
 February 14

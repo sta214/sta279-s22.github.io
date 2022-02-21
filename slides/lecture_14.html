@@ -282,6 +282,50 @@ For a 21 year old, what is the *empirical* relative risk of using long term vs. 
 
 ### Class activity, Part I
 
+.large[
+[https://sta279-s22.github.io/class_activities/ca_lecture_14.html](https://sta279-s22.github.io/class_activities/ca_lecture_14.html)
+]
+
+---
+
+### Class activity
+
+.large[
+
+| Speed Range | Slow | Good | Fast | Total |
+| --- | --- | --- | --- | --- |
+| `\((50, 51)\)` | 5 | 1 | 0 | 6 |
+| `\((51, 52)\)` | 5 | 5 | 3 | 13 |
+| `\((52, 53)\)` | 6 | 12 | 2 | 20 |
+| `\((53, 54)\)` | 5 | 31 | 4 | 40 |
+
+.question[
+    What is the relative risk of Good vs. Slow for the `\((52,53)\)` speed group?
+]
+]
+
+--
+
+.large[
+      Relative risk = `\(12/6 = 2\)`
+]
+
+---
+
+### Class activity
+
+.large[
+.question[
+How would you interpret the relative risk of Good vs. Slow for the `\((52, 53)\)` speed group?
+]
+]
+
+--
+
+.large[
+If the winning speed was between 52 and 53 mph, then the probability of Good conditions is twice the probability of Slow conditions.
+]
+  
 ---
 
 ### Log relative risk
@@ -378,6 +422,64 @@ What is the predicted relative risk of long term vs. none for a woman age 30?
 ---
 
 ### Class activity, Part II
+
+.large[
+[https://sta279-s22.github.io/class_activities/ca_lecture_14.html](https://sta279-s22.github.io/class_activities/ca_lecture_14.html)
+]
+
+---
+
+### Class activity
+
+.large[
+.question[
+Write down the population multinomial regression model, using Slow as the reference category, and assuming that the log relative risk is a linear function of Speed.
+]
+]
+
+--
+
+.large[
+`$$Y_i \sim Categorical(\pi_{i(Slow)}, \pi_{i(Good)}, \pi_{i(Fast)})$$`
+
+`$$\log\left( \dfrac{\pi_{i(Good)}}{\pi_{i(Slow)}} \right) = \beta_{0(Good)} + \beta_{1(Good)} \ Speed_i$$`
+
+`$$\log\left( \dfrac{\pi_{i(Fast)}}{\pi_{i(Slow)}} \right) = \beta_{0(Fast)} + \beta_{1(Fast)} \ Speed_i$$`
+]
+
+---
+
+### Class activity
+
+.large[
+`$$\log \left( \dfrac{\widehat{\pi}_{i(Good)}}{\widehat{\pi}_{i(Slow)}} \right) = -39.68 + 0.77 \ \text{Speed}_i$$`
+
+.question[
+Calculate the predicted relative risk of Good vs. Slow for a race where the winning speed was 52.5 mph.
+]
+]
+
+--
+
+.large[
+`\(\exp\{ -39.68 + 0.77 \cdot 52.5 \} = 2.11\)`
+]
+
+---
+
+### Class activity
+
+.large[
+.question[
+From this information, can you calculate the predicted *probability* that the condition was Good? If not, what more information do you need?
+]
+]
+
+--
+
+.large[
+No -- we need to relative risk for fast vs. slow too.
+]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
