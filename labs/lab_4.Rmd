@@ -1,0 +1,313 @@
+---
+title: "Lab 4"
+output: 
+  rmdformats::robobook:
+    css: "homework.css"
+    highlight: pygments
+link-citations: yes
+---
+
+**Due:** Friday, March 4, 12:00pm (noon) on Canvas
+
+**Instructions:**  There are two parts to this assignment. In Part I, you will practice fitting and predicting with a multinomial regression model. In Part II, you will derive maximum likelihood estimates for a categorical random variable.
+
+A template R Markdown file is provided: [lab_04_template.Rmd](https://sta279-s22.github.io/labs/lab_04_template.Rmd)
+
+When you are done with the lab, submit your knitted HTML file to Canvas. For Part II, you may submit a separate scan of your written work, if you prefer.
+
+# Data
+
+Today, we are going to work with a data set from [DrivenData](https://www.drivendata.org/competitions/57/nepal-earthquake/page/134/), an online data competition site that hosts competitions aimed at improving education, health, safety, and general well being for individuals around the world.
+
+Our data today come from the 2015 Gorkha earthquake in Nepal. After the earthquake, a large scale survey was conducted to determine the amount of damage the earthquake caused for homes, businesses and other structures. This is one of the largest post-disaster surveys in the world, and today we will be using it to determine what characteristics were associated with different levels of building damage. Can we determine factors that are associated with completely demolished structures, or with buildings that were not damaged at all?
+
+We have 39 different variables in this data set, some categorical and some numeric. The meaning of each variable is given [here](https://www.drivendata.org/competitions/57/nepal-earthquake/page/136/). Today, we will only focus on a few.
+
+## Loading the data
+
+The `earthquake` data can be loaded into R with the following command:
+
+```r
+earthquake <- read.csv("https://sta279-s22.github.io/labs/EarthquakeData.csv")
+```
+
+# Part I: Earthquake Data
+
+Our goal today is to determine what features might be related to the amount of destruction a building sustained during the earthquake. The response variable is `Damage`, and it has three levels: none, moderate, and severe. None means there was minimal or no damage, "moderate" means there was moderate damage, and "severe" means the building was basically destroyed.
+
+### EDA: Damage
+
+:::{.question}
+#### Question 1
+
+Make an appropriate graph *and* a professionally formatted table to explore the distribution of the response variable. Label your figure Figure 1.
+
+:::
+
+:::{.question}
+#### Question 2
+
+What percent of the buildings in the data were in each damage category?
+
+:::
+
+Why do these counts matter? Well, multinomial regression does not work well if any of the categories are too small. It works best when all the levels of the response variable have roughly the same number of rows in the data, but that rarely happens. We run into trouble if any of the categories are too small. Generally, we want our smallest category to have approximately 10% of the rows.
+
+Now that we can see the counts, let's choose our baseline level (also known as the reference level). By default, R typically chooses the level which comes first alphabetically to be the baseline level. To choose a different baseline, we can make `Damage` a `factor` variable in R, and specify the levels in order (the first is our baseline).
+
+For example, to make "none" the baseline we could use
+
+```r
+earthquake <- earthquake %>%
+  mutate(Damge = as.factor(Damage, levels = c("none", "moderate", "severe")))
+```
+
+There are two ways to choose the baseline.We can choose a level that makes sense as a reference level in our analysis, like something that is the "standard" value. This makes interpretation nice because we are comparing the log relative risk of something happening versus the standard thing happening.
+
+However, we run into problems with this if the category that makes sense as our baseline is the smallest category. The smallest category is the hardest for our model to work with, and so is not necessarily what we want as our reference level.
+
+In these cases, we generally choose whichever category is the largest as our baseline. This has some nice mathematical properties since the largest group is being used as the reference level to estimate both lines.
+
+:::{.question}
+#### Question 3
+
+What level do you think we should use for the baseline? If necessary, use code to tell R that this is the level you want for the baseline.
+
+:::
+
+### EDA: Age
+
+Our task now is to explore what might be related to a building having severe damage versus moderate damage, or none versus moderate damage. This helps with planning and preparation in case of another disaster.
+
+When we think about why some buildings were damaged more than others, one of the first things we might think about exploring is the age of the building. What is the relationship between the age of the building (X) and the damage (Y)?
+
+Because we are thinking about regression modeling, we need to be able to check the shape of the relationship between age and the log relative risk. This will help us decide on the form of our model. This requires a new plot...and some new code.
+
+Because log relative risks are very similar to log odds, we can adapt the `logodds_plot` function from Lab 3 to create empirical log relative risk plots. The `log_rr_plot` function below is mostly complete, and it works like the `logodds_plot` function. The only difference is we have added two arguments: `cat_num` (which category is in the numerator of the relative risk), and `cat_denom` (which category is in the denominator of the relative risk).
+
+```r
+log_rr_plot <- function(data, num_bins, bin_method,
+                         x, y, cat_num, cat_denom,
+                         grouping = NULL, reg_formula = y ~ x){
+  
+  if(is.null(grouping)){
+    dat <- data.frame(x = data[,x], 
+                      y = data[,y],
+                      group = 1)
+  } else {
+    dat <- data.frame(x = data[,x], 
+                      y = data[,y],
+                      group = data[,grouping])
+  }
+  
+  
+  ##### Part to edit #####
+  
+  dat <- dat %>%
+    filter(y %in% c(..., ...)) %>%
+    mutate(obs = ifelse(y == ..., 1, 0))
+  
+  
+  ########################
+  
+  
+  if(bin_method == "equal_size"){
+    logodds_table <- dat %>%
+      slice_sample(n = nrow(dat), replace=F) %>%
+      drop_na() %>%
+      arrange(group, x) %>%
+      group_by(group) %>%
+      mutate(bin = rep(1:num_bins,
+                       each=ceiling(n()/num_bins))[1:n()]) %>%
+      group_by(bin, group) %>%
+      summarize(mean_x = mean(x),
+                prop = mean(c(obs, 0.5)),
+                num_obs = n()) %>%
+      ungroup() %>%
+      mutate(logodds = log(prop/(1 - prop)))
+  } else {
+    logodds_table <- dat %>%
+      slice_sample(n = nrow(dat), replace=F) %>%
+      drop_na() %>%
+      group_by(group) %>%
+      mutate(bin = cut(x, 
+                       breaks = num_bins,
+                       labels = F)) %>%
+      group_by(bin, group) %>%
+      summarize(mean_x = mean(x),
+                prop = mean(c(obs, 0.5)),
+                num_obs = n()) %>%
+      ungroup() %>%
+      mutate(logodds = log(prop/(1 - prop)))
+  }
+  
+  if(is.null(grouping)){
+    logodds_table %>%
+      ggplot(aes(x = mean_x,
+                 y = logodds)) +
+      geom_point(size=2.5) +
+      geom_smooth(se=F, method="lm", formula = reg_formula) +
+      theme_bw() +
+      labs(x = x,
+           y = paste("Log RR", cat_num, "vs.", cat_denom)) +
+      theme(text = element_text(size=25))
+  } else {
+    logodds_table %>%
+      ggplot(aes(x = mean_x,
+                 y = logodds,
+                 color = group,
+                 shape = group)) +
+      geom_point(size=2.5) +
+      geom_smooth(se=F, method="lm", formula = reg_formula) +
+      theme_bw() +
+      labs(x = x,
+           y = paste("Log RR", cat_num, "vs.", cat_denom),
+           color = grouping,
+           shape = grouping) +
+      theme(text = element_text(size=25))
+  }
+  
+}
+```
+
+:::{.question}
+#### Question 4
+
+There is still a small section of the `log_rr_plot` function above that isn't complete (`Part to edit`). This part of the code is meant to keep only the rows of data which correspond to the two levels of `y` that we want to compare in the plot. We then create a new variable, `obs` which is 1 when for the numerator category, and 0 for the denominator (reference) category.
+
+Fill in the `...` in the code to complete the function.
+
+:::
+
+:::{.question}
+#### Question 5
+
+Create two empirical log relative risk plots: one to explore the relationship between age and the log relative risk of no damage vs. moderate, and one to explore the relationship between age and the log relative risk of severe damage vs. moderate. Add a second order polynomial to both plots.
+
+:::
+
+### Modeling
+
+:::{.question}
+#### Question 6
+
+Based on the transformation I suggested for Age (the second order polynomial), write down Step 1 and Step 2 for building a parametric model for damage grade. This should be the population model form (so no hats!).
+
+:::
+
+:::{.question}
+#### Question 7
+
+Fit the model from question 6, using the `multinom` function in the `nnet` package. Write down the fitted regression line(s) using appropriate notation. As in the project, make the equations look nice in your knitted assignment.
+
+:::
+
+:::{.question}
+#### Question 8
+
+Calculate the predicted probability of severe damage for a building 10 years old. Show all work.
+
+:::
+
+Finally, let's visualize our fitted model. We can plot how the probabilities of different categories of damage change with age. We need another function to help us with this.
+
+```r
+plot_probsMultinom <- function(model, data, xvar){
+  probs <- fitted(model)
+  levels <- colnames(probs)
+  dat <- cbind(data.frame(x = data[,xvar]), probs) %>%
+    pivot_longer(!x, names_to = "level", values_to = "Probability")
+    
+  dat %>%
+    arrange(x) %>%
+    ggplot(aes(x = x, y = Probability)) +
+    geom_line(lwd = 1.2) +
+    theme_bw() +
+    labs(x = xvar) +
+    facet_grid(level ~ .)
+}
+```
+
+This function has 3 arguments:
+
+* `model`: the multinomial regression model to plot
+* `data`: the original data we used to fit the model (eg., `earthquake`)
+* `xvar`: the name of the explanatory variable to plot against, in quotes (e.g., `"age"`)
+
+
+:::{.question}
+#### Question 9
+
+Create a plot using `plot_probsMultinom`. Based on the plot, describe how the probabilities of each damage category change with age (roughly one sentence per category). This does not need to be formal response; pretend you are explaining to someone for a news article.
+:::
+
+:::{.question}
+#### Question 10
+
+Create a confusion matrix for your predictions, with code like
+
+```r
+table("Prediction" = predict(m1), "Actual" = earthquake$Damage)
+```
+
+Calculate the accuracy of your predictions, and assess performance within each level (moderate, none, severe) as well. Are we doing a good job at predicting damage?
+:::
+
+
+# Part II: Maximum likelihood estimation
+
+In the second part of the lab, we'll derive the maximum likelihood estimate for probabilities of a categorical distribution. Since a Bernoulli distribution is just a categorical distribution with two categories, a lot of the derivation looks like it did for the Bernoulli.
+
+Let $Y_i \sim Categorical(\pi_1,...,\pi_J)$ be a categorical variable with $J$ levels. For simplicity we will assume that the probabilities $\pi_j$ do not depend on any covariates (and so are the same for all individuals $i$). We observe $n$ observations $Y_1,...,Y_n$, of which $n_1$ belong to level $j=1$, $n_2$ belong to level $j = 2$, etc.
+
+:::{.question}
+#### Question 11
+
+Let $\widehat{\pi}_1, ..., \widehat{\pi}_J$ be estimates of the $J$ probabilities. Show that the log likelihood is given by
+
+$$\log L(\widehat{\pi}_1, ..., \widehat{\pi}_J) = \sum \limits_{j=1}^J n_j \log \widehat{\pi}_j$$
+
+:::
+
+Now we want to choose $\widehat{\pi}_1, ..., \widehat{\pi}_J$ to maximize the log likelihood. But maximization is a little tricker when we have multiple parameters to simultaneously estimate. 
+
+To get the maximum likelihood estimates, we will use a calculus tool called the **Lagrange multiplier theorem**, which is motivated by the fact that $\sum \limits_{j=1}^J \widehat{\pi}_j = 1$. For this problem, the Lagrange multiplier theorem tells us that to find $\widehat{\pi}_1, ..., \widehat{\pi}_J$ which maximize $\log L(\widehat{\pi}_1, ..., \widehat{\pi}_J)$, we can find $\widehat{\pi}_1, ..., \widehat{\pi}_J, \lambda$ such that for each $j$,
+
+$$ \dfrac{d}{d \widehat{\pi}_j} \left( \log L(\widehat{\pi}_1, ..., \widehat{\pi}_J) - \lambda \left( \sum \limits_{j=1}^J \widehat{\pi}_j - 1 \right) \right) = 0$$
+
+and
+
+$$ \dfrac{d}{d \lambda} \left( \log L(\widehat{\pi}_1, ..., \widehat{\pi}_J) - \lambda \left( \sum \limits_{j=1}^J \widehat{\pi}_j - 1 \right) \right) = 0$$
+
+(Here $\lambda$ is some unknown number).
+
+
+:::{.question}
+#### Question 12
+
+Take derivatives to find 
+
+$$\dfrac{d}{d \widehat{\pi}_j} \left( \log L(\widehat{\pi}_1, ..., \widehat{\pi}_J) - \lambda \left( \sum \limits_{j=1}^J \widehat{\pi}_j - 1 \right) \right)$$ 
+
+and
+
+$$ \dfrac{d}{d \lambda} \left( \log L(\widehat{\pi}_1, ..., \widehat{\pi}_J) - \lambda \left( \sum \limits_{j=1}^J \widehat{\pi}_j - 1 \right) \right)$$
+:::
+
+:::{.question}
+#### Question 13
+
+By setting your derivatives from the previous question equal to 0, show that
+
+$$\widehat{\pi}_j = \dfrac{n_j}{\lambda}$$
+:::
+
+:::{.question}
+#### Question 14
+
+Using the previous question and the fact that $\sum \limits_{j=1}^J \widehat{\pi}_j = 1$, show that
+
+$$\widehat{\pi}_j = \dfrac{n_j}{n}$$
+(That is, our estimated probability of level $j$ is just the fraction of observations in that level).
+:::
+
