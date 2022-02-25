@@ -12,5 +12,6 @@ February 23
 
 February 25
 : Lab 4
+  : [Lab](https://sta279-s22.github.io/labs/lab_4.html)
 
-: : **Project 1 Due**{: .label .label-red }
+: **Project 1 Due**{: .label .label-red }
