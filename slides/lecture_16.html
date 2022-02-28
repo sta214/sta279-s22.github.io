@@ -15,6 +15,18 @@ class: center, middle, inverse, title-slide
 ---
 
 
+### Agenda
+
+.large[
+* Congrats on finishing Project 1!
+* Math/Stats alumni panel 
+  * Tuesday, March 1 (tomorrow), 5-6pm Manchester 121
+* Lab 4 due Friday
+* Today: predictions and LRTs with multinomial regression
+]
+
+---
+
 ### Data
 
 .large[
@@ -109,6 +121,10 @@ table(cmc_data$Choice)/nrow(cmc_data)
 ---
 
 ### Class activity
+
+.large[
+[https://sta279-s22.github.io/class_activities/ca_lecture_16.html](https://sta279-s22.github.io/class_activities/ca_lecture_16.html)
+]
 
 ---
 
@@ -231,7 +247,8 @@ Sort of:
 
 .large[
 * By itself, accuracy isn't particularly useful for summarizing prediction performance
-* We need to look at predictive ability for each class
+* It is helpful to interpret accuracy in relation to simple random guessing. Our model isn't very good if we can't beat a random guess
+* We also need to look at predictive ability for each class
 ]
 
 ---
@@ -414,6 +431,14 @@ pchisq(126.905, df=4, lower.tail=F)
 ```
 
 So we have very strong evidence that there is a relationship between age and contraceptive choice.
+]
+
+---
+
+### Next steps
+
+.large[
+Later we will learn about another tool for hypothesis testing and confidence intervals: *bootstrapping*
 ]
 
     </textarea>
