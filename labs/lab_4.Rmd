@@ -59,7 +59,7 @@ For example, to make "none" the baseline we could use
 
 ```r
 earthquake <- earthquake %>%
-  mutate(Damge = as.factor(Damage, levels = c("none", "moderate", "severe")))
+  mutate(Damge = factor(Damage, levels = c("none", "moderate", "severe")))
 ```
 
 There are two ways to choose the baseline.We can choose a level that makes sense as a reference level in our analysis, like something that is the "standard" value. This makes interpretation nice because we are comparing the log relative risk of something happening versus the standard thing happening.
