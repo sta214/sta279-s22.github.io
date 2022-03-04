@@ -1,0 +1,237 @@
+---
+title: "Lab 5"
+output: 
+  rmdformats::robobook:
+    css: "homework.css"
+    highlight: pygments
+link-citations: yes
+---
+
+**Due:** Friday, March 18, 12:00pm (noon) on Canvas
+
+A template R Markdown file is provided: [lab_05_template.Rmd](https://sta279-s22.github.io/labs/lab_05_template.Rmd)
+
+When you are done with the lab, submit your knitted HTML file to Canvas.
+
+# Data
+
+In this lab, we will continue working with the earthquake data from Lab 4. As before, we are interested in determining what characteristics are associated with different levels of building damage. Can we determine factors that are associated with completely demolished structures, or with buildings that were not damaged at all?
+
+We have 39 different variables in this data set, some categorical and some numeric. The meaning of each variable is given [here](https://www.drivendata.org/competitions/57/nepal-earthquake/page/136/). Today, we will only focus on a few.
+
+## Loading the data
+
+The `earthquake` data can be loaded into R with the following command:
+
+```r
+earthquake <- read.csv("https://sta279-s22.github.io/labs/EarthquakeData.csv")
+```
+
+# Questions
+
+As in Lab 4, our response variable is `Damage`, and it has three levels: none, moderate, and severe. None means there was minimal or no damage, "moderate" means there was moderate damage, and "severe" means the building was basically destroyed. 
+
+Today we will look at building size as an explanatory variable. Building size is measured by the `area_percentage` variable, which normalizes the area of the building to a value between 0 and 100 (larger values mean a larger area).
+
+## EDA and model choice
+
+:::{.question}
+#### Question 1
+
+Make a graph showing the distribution of building area in the data. Use your graph, and calculate summary statistics, to describe the distribution (discuss shape, modality, center, and spread).
+
+:::
+
+We notice from Question 1 that building area is very right-skewed, as we might expect (most buildings, like houses or stores, are pretty small. But there are a few large ones, like schools or hospitals). We will need to keep this skewness in mind when we fit our model.
+
+Let's now look at the relationship between building area and damage.
+
+:::{.question}
+#### Question 2
+
+Using code from Lab 4, create a log relative risk plot showing the empirical log relative risk of no damage vs. moderate damage as a function of building size. Use 20 bins, and use `bin_method = "equal_size"`. What do you notice about the x-axis in the resulting plot? Why is this a problem for choosing a model?
+
+:::
+
+Setting `bin_method = "equal_size"` means that all our bins in the log relative risk plot have the same number of points. Sometimes this is useful, but other times (like in Question 2) it can lead to issues. 
+
+:::{.question}
+#### Question 3
+
+Look back at Questions 1 and 2. What feature of the building area variable causes a problem in your log relative risk plot when you use bins of equal size?
+
+:::
+
+One way we can try to fix the issue in Question 2 is by using bins of equal *width*, rather than equal size, to make our plot.
+
+:::{.question}
+#### Question 4
+
+Remake the log relative risk plot from Question 2. This time, use `bin_method = "equal_width"`. How does the resulting plot compare to the one from Question 2?
+
+:::
+
+Unfortunately, using bins of equal width with a skewed variable can cause problems too. If we don't have enough points in each bin, our estimates of the log relative risk can be poor. The function below creates a log relative risk table, showing the number of observations and the log relative risk in each bin (this table is what gets used to make the plot).
+
+```r
+log_rr_table <- function(data, num_bins, bin_method,
+                             x, y, cat_num, cat_denom,
+                             grouping = NULL){
+  if(is.null(grouping)){
+    dat <- data.frame(x = data[,x], 
+                      y = data[,y],
+                      group = 1)
+  } else {
+    dat <- data.frame(x = data[,x], 
+                      y = data[,y],
+                      group = data[,grouping])
+  }
+  
+  
+  ##### Part to edit #####
+  
+  dat <- dat %>%
+    filter(y %in% c(cat_num, cat_denom)) %>%
+    mutate(obs = ifelse(y == cat_num, 1, 0))
+  
+  
+  ########################
+  
+  
+  if(bin_method == "equal_size"){
+    logodds_table <- dat %>%
+      slice_sample(n = nrow(dat), replace=F) %>%
+      drop_na() %>%
+      arrange(group, x) %>%
+      group_by(group) %>%
+      mutate(bin = rep(1:num_bins,
+                       each=ceiling(n()/num_bins))[1:n()]) %>%
+      group_by(bin, group) %>%
+      summarize(mean_x = mean(x),
+                prop = mean(c(obs, 0.5)),
+                num_obs = n()) %>%
+      ungroup() %>%
+      mutate(logodds = log(prop/(1 - prop)))
+  } else {
+    logodds_table <- dat %>%
+      slice_sample(n = nrow(dat), replace=F) %>%
+      drop_na() %>%
+      group_by(group) %>%
+      mutate(bin = cut(x, 
+                       breaks = num_bins,
+                       labels = F)) %>%
+      group_by(bin, group) %>%
+      summarize(mean_x = mean(x),
+                prop = mean(c(obs, 0.5)),
+                num_obs = n()) %>%
+      ungroup() %>%
+      mutate(logodds = log(prop/(1 - prop)))
+  }
+  
+  return(logodds_table)
+}
+```
+
+The `log_rr_table` function gets called in the same way as the `log_rr_plot` function (the only difference is that we don't specify a regression formula, because we're not making a plot).
+
+:::{.question}
+#### Question 5
+
+Create the log relative risk table corresponding to your plot from Question 4. Does it look like you have enough observations in all of the bins? (We would like at least 8-10 observations in each bin).
+
+:::
+
+To deal with this issue, we can transform building area, and change the number of bins.
+
+:::{.question}
+#### Question 6
+
+Create a new column in the `earthquake` data that is the square root of `area_percentage`. Then make 3 plots showing the relationship between the square root of area and the log relative risk of no damage vs. moderate damage. In these three plots, use 12, 20, and 30 bins. Use `bin_method = "equal_width"` in each plot.
+
+:::
+
+If the shape of the relationship appears similar as we change the number of bins, then we are more confident about our model choice.
+
+:::{.question}
+#### Question 7
+
+Experiment with polynomial transformations of order 2, 3, and 4 on the square root of `area_percentage`. Which polynomial looks like the best fit, for the log relative risk of none vs. moderate?
+
+:::
+
+Now let's check the log relative risk of severe vs. moderate.
+
+:::{.question}
+#### Question 8
+
+Create an empirical log relative risk plot for severe vs. moderate, with the square root of area as your explanatory variable. Which polynomial transformation (order 2, 3, or 4) looks like the best fit?
+
+:::
+
+Log relative risk plots are valuable for visualization, but we want to make sure we don't overfit the data. As in logistic regression, the AIC is a useful way of comparing different models.
+
+:::{.question}
+#### Question 9
+
+Fit three multinomial regression models of Damage on the square root of area, using polynomial transformations of orders 2, 3, and 4. Compare the AIC of your fitted models, and choose the model with the lowest AIC. Does this agree with your choice in questions 7 and 8?
+
+:::
+
+Now let's add in the Age variable we looked at in Lab 4.
+
+:::{.question}
+#### Question 10
+
+Fit a multinomial regression model with both Age and the square root of building area as predictors, and Damage as your response. For Age, use a polynomial transformation of order 2 (as we saw in Lab 4). For the square root of area, use the polynomial transformation you selected in Question 9. You may ignore potential interactions between Age and Area for this question.
+
+Write down the equation of your fitted model.
+
+:::
+
+## Prediction
+
+:::{.question}
+#### Question 11
+
+Using your fitted model from Question 10, what is the predicted probability of severe damage for a building that is 25 years old, and for which `area_percentage = 20`?
+
+:::
+
+Now let's assess the performance of our predictions.
+
+:::{.question}
+#### Question 12
+
+Create a confusion matrix to assess the model from Question 10. Calculate the overall accuracy. Also, for each category (none, moderate, and severe damage), calculate the fraction of buildings which were correctly predicted. How does our performance compare to the model with just age, from Lab 4?
+
+:::
+
+To assess performance, it can also help to compare against random guessing. In class, we discussed two types of random guessing: 
+
+* assign every building randomly to one of the three categories, with a 1/3 chance for each category
+* predict the most common category for each building. For this data, that would mean predicting that every building suffered moderate damage
+
+:::{.question}
+#### Question 13
+
+Calculate the overall accuracy for each random guessing scheme. How does our model, from Question 10, compare to random guessing?
+
+:::
+
+## Hypothesis testing
+
+Finally, we can do a hypothesis test. We would like to know whether there is a relationship between building age and damage, after accounting for building size.
+
+:::{.question}
+#### Question 14
+
+Write down the full and reduced models that you will compare to investigate this research question.
+
+:::
+
+:::{.question}
+#### Question 15
+
+Compare the models in Question 14 with a likelihood ratio test. Report the test statistic, degrees of freedom, and p-value. Then make a conclusion.
+
+:::
