@@ -88,14 +88,9 @@ log_rr_table <- function(data, num_bins, bin_method,
   }
   
   
-  ##### Part to edit #####
-  
   dat <- dat %>%
     filter(y %in% c(cat_num, cat_denom)) %>%
     mutate(obs = ifelse(y == cat_num, 1, 0))
-  
-  
-  ########################
   
   
   if(bin_method == "equal_size"){
