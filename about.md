@@ -165,7 +165,7 @@ Further instructions and grading rubrics will be provided with each project.
 
 We will have two in-class exams. Tentative dates (subject to change) can be found on the course calendar.
 
-We will also have a final exam. The scheduled final exam time for this course is **Saturday, April 30** at 2pm.
+We will also have a final exam. The scheduled final exam time for this course is **Tuesday, May 3** at 2pm.
 
 
 ## Grading

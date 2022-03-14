@@ -17,12 +17,20 @@ editor_options:
 .large[
 * Mask policy
 * Statistics classes next semester
+* Tentative course schedule
 * Linear mixed models
 ]
 
 ---
 
 ### Masks
+
+.large[
+* On March 19, masks will become optional in most spaces on campus
+* However, faculty can request that masks be worn in classroom spaces
+* Please let me know if there are any circumstances or needs that I should be aware of when making my decision
+  * Anonymous survey sent out
+]
 
 ---
 
@@ -34,13 +42,30 @@ editor_options:
 * STA 311 (Inference)
   * Requires STA 310
 * STA 312 (Linear models)
-  * Requires MST 112 (Calc 2) and STA 310
+  * Requires STA 310, and MST 121 or MST 205 (Linear algebra)
 * STA 362 (Multivariate statistics)
   * Requires MST 121 or MST 205 (Linear algebra)
 * STA 363 (Statistical learning)
   * Requires MST 121 or MST 205 (Linear algebra)
 * STA 368 (Time series)
   * Requires STA 310
+]
+
+---
+
+### Tentative course schedule
+
+.large[
+* Current topics (next 3 weeks):
+  * Linear mixed effects models
+  * Inference with mixed effects models
+  * Parametric bootstrap
+* Exam 2 (multinomial regression and mixed effects): April 6
+* Project 2: released April 8, due April 22
+* Last 3 weeks of course:
+  * Poisson regression and GLMs
+  * Assumptions, diagnostics, and inference
+* Final exam: Tuesday, May 3, 2pm
 ]
 
 ---
@@ -948,6 +973,10 @@ $\sigma_\varepsilon^2$ is small relative to $\sigma_u^2$
 ---
 
 ### Class activity
+
+.large[
+[https://sta279-s22.github.io/class_activities/ca_lecture_17.html](https://sta279-s22.github.io/class_activities/ca_lecture_17.html)
+]
 
 ---
 
