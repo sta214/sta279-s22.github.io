@@ -255,7 +255,7 @@ $\varepsilon_i \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$
 
 .large[
 .question[
-Which does this model assume about group effects (differences between professors)?
+What does this model assume about group effects (differences between professors)?
 ]
 ]
 
@@ -277,7 +277,7 @@ $\varepsilon_i \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$
 
 .large[
 .question[
-Which does this model assume about correlation within a class?
+What does this model assume about correlation within a class?
 ]
 ]
 
