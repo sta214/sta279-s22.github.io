@@ -13,3 +13,5 @@ March 16
 
 March 18
 : **Lab**{: .label .label-purple }
+
+: **Lab 5 due**{: .label .label-red }
