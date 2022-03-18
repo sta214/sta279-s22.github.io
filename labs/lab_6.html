@@ -248,7 +248,7 @@
 <p><em>Note: you may have seen this data in 112, where we looked at log mass and log metabolic rate. We will just use Mass and Metabolic rate (no logs) for this lab.</em></p>
 <div id="eda" class="section level2">
 <h2>EDA</h2>
-<p>For simplicity, we will focus on just the <em>Bugula</em> for now. There is also an issue with late-stage measurements, so we will follow Pettersen <em>et al.</em> and work just with the larval and early-stage <em>Bugula</em>.</p>
+<p>For simplicity, we will focus on just the early-stage <em>Bugula</em> for now.</p>
 <div id="question-1" class="section level4 question">
 <h4>Question 1</h4>
 <p>Create a new dataset, called <code>bugula_early</code>, which contains only the early-stage <em>Bugula</em> from the <code>bryozoan</code> data. Use this new dataset for the rest of the lab.</p>
@@ -268,7 +268,7 @@
 <p>Motivated by Question 3, we will fit the following model:</p>
 <p><span class="math display">\[Metabolic_{ij} = \beta_0 + u_i + \varepsilon_{ij}\]</span></p>
 <p>where <span class="math inline">\(Metabolic_{ij}\)</span> is the metabolic rate for organism <span class="math inline">\(j\)</span> in run <span class="math inline">\(i\)</span>, and <span class="math inline">\(u_i \sim N(0, \sigma_u^2)\)</span>, <span class="math inline">\(\varepsilon_{ij} \sim N(0, \sigma_\varepsilon^2)\)</span>.</p>
-<p>This is called a <em>random intercepts model</em>, because we don’t include any variables; we just have random variation around the intercept <span class="math inline">\(\beta_0\)</span>.</p>
+<p>This is called a <em>random intercepts model</em>, because we don’t include any other variables; we just have random variation around the intercept <span class="math inline">\(\beta_0\)</span>.</p>
 <div id="question-4" class="section level4 question">
 <h4>Question 4</h4>
 <p>Run the following code to fit the random intercepts model (make sure the <code>lme4</code> package is loaded).</p>

@@ -51,7 +51,7 @@ We will begin with some EDA, then fit some mixed effects models to the data. We 
 
 ## EDA
 
-For simplicity, we will focus on just the *Bugula* for now. There is also an issue with late-stage measurements, so we will follow Pettersen *et al.* and work just with the larval and early-stage *Bugula*.
+For simplicity, we will focus on just the early-stage *Bugula* for now.
 
 :::{.question}
 #### Question 1
@@ -85,7 +85,7 @@ $$Metabolic_{ij} = \beta_0 + u_i + \varepsilon_{ij}$$
 
 where $Metabolic_{ij}$ is the metabolic rate for organism $j$ in run $i$, and $u_i \sim N(0, \sigma_u^2)$, $\varepsilon_{ij} \sim N(0, \sigma_\varepsilon^2)$.
 
-This is called a *random intercepts model*, because we don't include any variables; we just have random variation around the intercept $\beta_0$.
+This is called a *random intercepts model*, because we don't include any other variables; we just have random variation around the intercept $\beta_0$.
 
 :::{.question}
 #### Question 4
