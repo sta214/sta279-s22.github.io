@@ -93,7 +93,7 @@ This is called a *random intercepts model*, because we don't include any other v
 Run the following code to fit the random intercepts model (make sure the `lme4` package is loaded).
 
 ```{r eval=F}
-m1 <- lmer(Metabolic ~ (1|Run), data = bugula)
+m1 <- lmer(Metabolic ~ (1|Run), data = bugula_early)
 summary(m1)
 ```
 
@@ -181,7 +181,7 @@ where $\lambda$ is an unknown parameter. (Recall that $y! = y(y-1)(y-2) \cdots (
 
 To estimate $\lambda$, we observe a sample of $n$ observations, $Y_1, Y_2, ..., Y_n$. For an estimate $\widehat{\lambda}$, the likelihood is therefore
 
-$L(\widehat{\lambda}) = \prod \limits_{i=1}^n \dfrac{\lambda^{Y_i} e^{-\lambda}}{Y_i!}$
+$L(\widehat{\lambda}) = \prod \limits_{i=1}^n \dfrac{\widehat{\lambda}^{Y_i} e^{-\widehat{\lambda}}}{Y_i!}$
 
 
 :::{.question}

@@ -272,7 +272,7 @@
 <div id="question-4" class="section level4 question">
 <h4>Question 4</h4>
 <p>Run the following code to fit the random intercepts model (make sure the <code>lme4</code> package is loaded).</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Metabolic <span class="sc">~</span> (<span class="dv">1</span><span class="sc">|</span>Run), <span class="at">data =</span> bugula)</span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Metabolic <span class="sc">~</span> (<span class="dv">1</span><span class="sc">|</span>Run), <span class="at">data =</span> bugula_early)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m1)</span></code></pre></div>
 <p>Report the parameter estimates <span class="math inline">\(\widehat{\beta}_0\)</span>, <span class="math inline">\(\widehat{\sigma}_u^2\)</span>, and <span class="math inline">\(\widehat{\sigma}_\varepsilon^2\)</span>.</p>
 </div>
@@ -325,7 +325,7 @@
 <p><span class="math inline">\(P(Y_i = y) = \dfrac{\lambda^y e^{-\lambda}}{y!}\)</span>,</p>
 <p>where <span class="math inline">\(\lambda\)</span> is an unknown parameter. (Recall that <span class="math inline">\(y! = y(y-1)(y-2) \cdots (2)(1)\)</span> ).</p>
 <p>To estimate <span class="math inline">\(\lambda\)</span>, we observe a sample of <span class="math inline">\(n\)</span> observations, <span class="math inline">\(Y_1, Y_2, ..., Y_n\)</span>. For an estimate <span class="math inline">\(\widehat{\lambda}\)</span>, the likelihood is therefore</p>
-<p><span class="math inline">\(L(\widehat{\lambda}) = \prod \limits_{i=1}^n \dfrac{\lambda^{Y_i} e^{-\lambda}}{Y_i!}\)</span></p>
+<p><span class="math inline">\(L(\widehat{\lambda}) = \prod \limits_{i=1}^n \dfrac{\widehat{\lambda}^{Y_i} e^{-\widehat{\lambda}}}{Y_i!}\)</span></p>
 <div id="question-12" class="section level4 question">
 <h4>Question 12</h4>
 <p>Calculate the maximum likelihood estimate of <span class="math inline">\(\lambda\)</span>. Show all your steps.</p>
