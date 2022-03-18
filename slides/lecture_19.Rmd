@@ -28,8 +28,8 @@ editor_options:
 * I will be requesting that everyone wears a mask in class for the rest of the semester
   * I have heard from students across my classes that COVID infections, and the local COVID rate, impact their ability to return home at the end of the semester
 * Please be respectful of others' choices. Do not ask "Why are/aren't you wearing a mask?"
-* My office will remain a masked space
-  * If you prefer not to mask, we can meet over Zoom or outdoors
+* I will also request masks in my office
+  * If you prefer not to mask, I am happy to meet over Zoom or outdoors
 ]
 
 ---
