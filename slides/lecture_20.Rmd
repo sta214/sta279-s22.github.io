@@ -1,0 +1,557 @@
+---
+title: Inference with mixed effects models
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+### Agenda
+
+---
+
+### Data: flipped classrooms?
+
+.large[
+Data set has 375 rows (one per student), and the following variables:
+
+* `professor`: which professor taught the class (1 -- 15)
+* `style`: which teaching style the professor used (no flip, some flip, fully flipped)
+* `score`: the student's score on the final exam
+]
+
+---
+
+### Inference with linear models
+
+.large[
+\begin{align}
+Score_i &= \beta_0 + \beta_1 \text{SomeFlipped}_i + \beta_2 \text{FullyFlipped}_i + \varepsilon_{i}
+\end{align}
+
+**Research question:** Is there a relationship between teaching style and student score?
+
+.question[
+What are my null and alternative hypotheses, in terms of one or more model parameters?
+]
+]
+
+--
+
+.large[
+$H_0: \beta_1 = \beta_2 = 0$
+
+$H_A: \text{at least one of } \beta_1, \beta_2 \neq 0$
+]
+
+---
+
+### Inference with linear models
+
+.large[
+\begin{align}
+Score_i &= \beta_0 + \beta_1 \text{SomeFlipped}_i + \beta_2 \text{FullyFlipped}_i + \varepsilon_{i}
+\end{align}
+
+**Research question:** Is there a relationship between teaching style and student score?
+
+$H_0: \beta_1 = \beta_2 = 0$
+
+$H_A: \text{at least one of } \beta_1, \beta_2 \neq 0$
+
+.question[
+What test would I use to test these hypotheses?
+]
+]
+
+--
+
+.large[
+A nested F-test
+]
+
+---
+
+### F tests
+
+.large[
+\begin{align}
+Score_i &= \beta_0 + \beta_1 \text{SomeFlipped}_i + \beta_2 \text{FullyFlipped}_i + \varepsilon_{i}
+\end{align}
+
+**Research question:** Is there a relationship between teaching style and student score?
+
+$H_0: \beta_1 = \beta_2 = 0$
+
+$H_A: \text{at least one of } \beta_1, \beta_2 \neq 0$
+
+.question[
+What are my degrees of freedom for the F test?
+]
+]
+
+--
+
+.large[
+
+* numerator df = number of parameters tested = 2
+* denominator df = $n - \text{number of parameters in full model}$ = $n - 3$ (= 372)
+]
+
+---
+
+### F tests for mixed effects models
+
+.large[
+\begin{align}
+Score_{ij} &= \beta_0 + \beta_1 \text{SomeFlipped}_i + \beta_2 \text{FullyFlipped}_i + u_i + \varepsilon_{ij}
+\end{align}
+
+**Research question:** Is there a relationship between teaching style and student score?
+
+.question[
+What are my null and alternative hypotheses, in terms of one or more model parameters?
+]
+]
+
+--
+
+.large[
+Same hypotheses as before:
+
+$H_0: \beta_1 = \beta_2 = 0$
+
+$H_A: \text{at least one of } \beta_1, \beta_2 \neq 0$
+]
+
+---
+
+### F tests for mixed effects models
+
+.large[
+\begin{align}
+Score_{ij} &= \beta_0 + \beta_1 \text{SomeFlipped}_i + \beta_2 \text{FullyFlipped}_i + u_i + \varepsilon_{ij}
+\end{align}
+
+**Research question:** Is there a relationship between teaching style and student score?
+
+$H_0: \beta_1 = \beta_2 = 0$
+
+$H_A: \text{at least one of } \beta_1, \beta_2 \neq 0$
+
+**Test:** We will use an F test again
+
+* numerator df = number of parameters tested = 2
+* denominator df = ??
+]
+
+---
+
+### What *are* degrees of freedom?
+
+.large[
+Suppose we want to estimate the mean $\mu$ of a distribution. We observe $n$ observations $X_1,...,X_n$, and calculate the sample mean
+
+$$\overline{X} = \dfrac{X_1 + X_2 + \cdots + X_n}{n}$$
+.question[
+Suppose we know the value of $\overline{X}$. How many of the values $X_1,...,X_n$ are "free to vary" (i.e., can be any number they want)?
+]
+]
+
+--
+
+.large[
+* Not all of them -- otherwise the sample mean could change
+* Once we know $\overline{X}$ and $X_1,...,X_{n-1}$, then there is only one value $X_n$ can be
+]
+
+---
+
+### What *are* degrees of freedom?
+
+.large[
+Suppose we want to estimate the mean $\mu$ of a distribution. We observe $n$ observations $X_1,...,X_n$, and calculate the sample mean
+
+$$\overline{X} = \dfrac{X_1 + X_2 + \cdots + X_n}{n}$$
+
+.question[
+Suppose we know the value of $\overline{X}$. How many of the values $X_1,...,X_n$ are "free to vary" (i.e., can be any number they want)?
+]
+]
+
+.large[
+* Once we know $\overline{X}$ and $X_1,...,X_{n-1}$, then there is only one value $X_n$ can be
+* *degrees of freedom* = $n - 1$
+]
+
+---
+
+### Example: simple linear regression
+
+.large[
+Observe $(X_1, Y_1), ..., (X_n, Y_n)$ and calculate
+$$\widehat{Y}_i = \widehat{\beta}_0 + \widehat{\beta}_1 X_i$$
+
+.question[
+What are my degrees of freedom?
+]
+]
+
+--
+
+.large[
+$n - 2$
+
+* Each parameter estimate adds a constraint
+* Degrees of freedom = 
+
+$$\text{number of independent observations} - \text{number of parameters}$$
+]
+
+---
+
+### Denominator degrees of freedom for mixed models
+
+.large[
+\begin{align}
+Score_{ij} &= \beta_0 + \beta_1 \text{SomeFlipped}_i + \beta_2 \text{FullyFlipped}_i + u_i + \varepsilon_{ij}
+\end{align}
+
+$H_0: \beta_1 = \beta_2 = 0 \hspace{1cm} H_A: \text{at least one of } \beta_1, \beta_2 \neq 0$
+
+**Test:** We will use an F test again
+
+* numerator df = number of parameters tested = 2
+* denominator df = 
+
+$$\text{number of independent observations} - \text{number of parameters}$$
+
+.question[
+Are all observations independent?
+]
+]
+
+--
+
+.large[
+No -- we have correlation within groups!
+]
+
+---
+
+### Denominator degrees of freedom for mixed models
+
+.large[
+\begin{align}
+Score_{ij} &= \beta_0 + \beta_1 \text{SomeFlipped}_i + \beta_2 \text{FullyFlipped}_i + u_i + \varepsilon_{ij}
+\end{align}
+
+$H_0: \beta_1 = \beta_2 = 0 \hspace{1cm} H_A: \text{at least one of } \beta_1, \beta_2 \neq 0$
+
+* numerator df = number of parameters tested = 2
+* denominator df = $\#$ independent observations - $\#$ parameters
+* But, observations within the same group are correlated!
+
+.question[
+How do I measure within-group correlation?
+]
+]
+
+--
+
+.large[
+Intra-class correlation: $\rho_{group} = \dfrac{\sigma_u^2}{\sigma_u^2 + \sigma_{\varepsilon}^2}$
+]
+
+---
+
+### Denominator degrees of freedom for mixed models
+
+.large[
+\begin{align}
+Score_{ij} &= \beta_0 + \beta_1 \text{SomeFlipped}_i + \beta_2 \text{FullyFlipped}_i + u_i + \varepsilon_{ij}
+\end{align}
+
+$\rho_{group} = \dfrac{\sigma_u^2}{\sigma_u^2 + \sigma_{\varepsilon}^2}$
+
+denominator df = $\# \ \text{independent observations} - \# \ \text{parameters}$
+
+.question[
+If $\sigma_u^2 > 0$ and $\sigma_\varepsilon^2 = 0$ (i.e., $\rho_{group} = 1$), how many independent observations do we have?
+]
+]
+
+--
+
+.large[
+The number of independent observations is equal to the number of groups (in this example, 15 classes)
+]
+
+---
+
+### Denominator degrees of freedom for mixed models
+
+.large[
+\begin{align}
+Score_{ij} &= \beta_0 + \beta_1 \text{SomeFlipped}_i + \beta_2 \text{FullyFlipped}_i + u_i + \varepsilon_{ij}
+\end{align}
+
+$\rho_{group} = \dfrac{\sigma_u^2}{\sigma_u^2 + \sigma_{\varepsilon}^2}$
+
+denominator df = $\# \ \text{independent observations} - \# \ \text{parameters}$
+
+.question[
+If $\sigma_u^2 = 0$ and $\sigma_\varepsilon^2 > 0$ (i.e., $\rho_{group} = 0$), how many independent observations do we have?
+]
+]
+
+--
+
+.large[
+The number of independent observations is equal to the total number of observations, $n$ (in this example, 375)
+]
+
+---
+
+### Denominator degrees of freedom for mixed models
+
+.large[
+\begin{align}
+Score_{ij} &= \beta_0 + \beta_1 \text{SomeFlipped}_i + \beta_2 \text{FullyFlipped}_i + u_i + \varepsilon_{ij}
+\end{align}
+
+$\rho_{group} = \dfrac{\sigma_u^2}{\sigma_u^2 + \sigma_{\varepsilon}^2}$
+
+denominator df = $\# \ \text{independent observations} - \# \ \text{parameters}$
+
+.question[
+If $\sigma_u^2 > 0$ and $\sigma_\varepsilon^2 > 0$ (i.e., $0 < \rho_{group} < 1$), how many independent observations do we have?
+]
+]
+
+--
+
+.large[
+More than the number of groups, fewer than the total number of observations
+]
+
+---
+
+### Bounds on the denominator degrees of freedom
+
+.large[
+\begin{align}
+Score_{ij} &= \beta_0 + \beta_1 \text{SomeFlipped}_i + \beta_2 \text{FullyFlipped}_i + u_i + \varepsilon_{ij}
+\end{align}
+]
+
+.large[
+
+$\rho_{group} = \dfrac{\sigma_u^2}{\sigma_u^2 + \sigma_{\varepsilon}^2}$
+
+$\# \ \text{groups} - p \ \leq \ \text{denominator df} \ \leq \ n - p$
+
+* $p =$ number of parameters in full model
+* $n =$ total number of observations
+* degrees of freedom decreases as $\rho_{group}$ increases
+]
+
+---
+
+### Approximating the degrees of freedom
+
+.large[
+```{r include=F}
+library(tidyverse)
+set.seed(3)
+mean_scores <- c(rnorm(5, 80, 6), rnorm(5, 87, 6), rnorm(5, 83, 6))
+
+teaching <- data.frame(professor = rep(1:15, each=25),
+           style = factor(rep(c("no flip", "some flip", "full flip"),
+                                 each=125),
+                             levels = c("no flip", "some flip", "full flip"))) %>%
+  mutate(score = rnorm(375, mean = mean_scores[professor], sd = 2),
+         professor = as.factor(professor))
+```
+
+```{r message=F, warning=F}
+library(lme4)
+library(lmerTest)
+m1 <- lmer(score ~ style + (1|professor), 
+           data = teaching)
+anova(m1)
+```
+
+* The `lmerTest` package approximates degrees of freedom with *Satterthwaite's method* (details are beyond the scope of this course)
+* This allows us to calculate (approximate) p-values
+]
+
+---
+
+### Approximating the degrees of freedom
+
+.large[
+```{r include=F}
+library(tidyverse)
+set.seed(3)
+mean_scores <- c(rnorm(5, 80, 6), rnorm(5, 87, 6), rnorm(5, 83, 6))
+
+teaching <- data.frame(professor = rep(1:15, each=25),
+           style = factor(rep(c("no flip", "some flip", "full flip"),
+                                 each=125),
+                             levels = c("no flip", "some flip", "full flip"))) %>%
+  mutate(score = rnorm(375, mean = mean_scores[professor], sd = 2),
+         professor = as.factor(professor))
+```
+
+```{r message=F, warning=F}
+anova(m1)
+```
+
+* Numerator df = 2 (as expected)
+* Denominator df $\approx$ 12 ( $\# \ \text{groups} - p$ )
+
+.question[
+Why is the estimated denominator df so low?
+]
+]
+
+--
+
+.large[
+Because $\widehat{\rho}_{group}$ is high (0.83)
+]
+
+---
+
+### Class activity
+
+---
+
+### Class activity
+
+.large[
+.question[
+There are 1561 rentals in 43 neighborhoods. What are the lower and upper bounds on the denominator degrees of freedom?
+]
+]
+
+--
+
+.large[
+$\# \ \text{groups} - p \ \leq \ \text{denominator df} \ \leq \ n - p$
+
+$41 \ \leq \ \text{denominator df} \ \leq \ 1559$
+]
+
+---
+
+### Class activity
+
+.large[
+.question[
+$\widehat{\rho}_{group} = 0.13$ . Would you expect the denominator df to be more similar to 41, or 1559?
+]
+]
+
+--
+
+.large[
+Probably more similar to 1559, since 0.13 is pretty low
+
+.question[
+What is the approximate denominator df, using Satterthwaite's method?
+]
+]
+
+--
+
+.large[
+1556.8
+]
+
+
+---
+
+### Class activity
+
+.large[
+.question[
+Do we have evidence for a relationship between overall satisfaction and price?
+]
+]
+
+--
+
+.large[
+Our test statistic is 5.52 and our p-value is 0.019, so we have moderate evidence for a relationship between overall satisfaction and price.
+]
+
+---
+
+### Class activity
+
+.large[
+$$Price_{ij} = \beta_0 + \beta_1 Satisfaction_{ij} + u_i + \varepsilon_{ij}$$
+$u_i \overset{iid}{\sim} N(0, \sigma_u^2) \hspace{1cm} \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$
+
+where $Price_{ij}$ is the price of rental $j$ in neighborhood $i$
+]
+
+.large[
+.question[
+What assumptions are we making in this mixed effects model?
+]
+]
+
+---
+
+### Assumptions
+
+.large[
+$$Price_{ij} = \beta_0 + \beta_1 Satisfaction_{ij} + u_i + \varepsilon_{ij}$$
+$u_i \overset{iid}{\sim} N(0, \sigma_u^2) \hspace{1cm} \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$
+]
+
+.large[
+* **Shape:** 
+  * the overall relationship between satisfaction and price is linear
+  * The slope is the *same* for each neighborhood
+]
+
+---
+
+### Assumptions
+
+.large[
+$$Price_{ij} = \beta_0 + \beta_1 Satisfaction_{ij} + u_i + \varepsilon_{ij}$$
+$u_i \overset{iid}{\sim} N(0, \sigma_u^2) \hspace{1cm} \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$
+]
+
+.large[
+* **Independence:** 
+  * random effects are independent
+  * observations within neighborhoods are independent after accounting for the random effect (i.e., the random effect captures the correlation within neighborhoods)
+  * observations from different neighborhoods are independent
+]
+
+---
+
+### Assumptions
+
+.large[
+$$Price_{ij} = \beta_0 + \beta_1 Satisfaction_{ij} + u_i + \varepsilon_{ij}$$
+$u_i \overset{iid}{\sim} N(0, \sigma_u^2) \hspace{1cm} \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$
+]
+
+.large[
+* **Normality:** Both $u_i \sim N(0, \sigma_u^2)$ and $\varepsilon_{ij} \sim N(0, \sigma_\varepsilon^2)$
+* **Constant variance:** 
+  * $\varepsilon_{ij}$ has the same variance $\sigma_\varepsilon^2$ regardless of satisfaction or neighborhood
+]
