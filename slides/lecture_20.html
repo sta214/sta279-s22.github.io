@@ -17,6 +17,12 @@ class: center, middle, inverse, title-slide
 
 ### Agenda
 
+.large[
+* F tests
+* Degrees of freedom
+* Assumptions
+]
+
 ---
 
 ### Data: flipped classrooms?
@@ -400,7 +406,6 @@ anova(m1)
 .large[
 
 
-
 ```r
 anova(m1)
 ```
@@ -429,7 +434,43 @@ Because `\(\widehat{\rho}_{group}\)` is high (0.83)
 
 ---
 
+### Why degrees of freedom matter
+
+.large[
+* If we use the wrong degrees of freedom, we get the wrong p-value
+* Often this means our p-value is smaller than it should be (we overestimate the strength of evidence)
+
+
+Using the correct degrees of freedom: 
+
+
+```r
+pf(7.69, 2, 12, lower.tail=F)
+```
+
+```
+## [1] 0.007087398
+```
+
+If we just did `\(n - p\)` (wrong):
+
+
+```r
+pf(7.69, 2, 372, lower.tail=F)
+```
+
+```
+## [1] 0.0005339106
+```
+]
+
+---
+
 ### Class activity
+
+.large[
+[https://sta279-s22.github.io/class_activities/ca_lecture_20.html](https://sta279-s22.github.io/class_activities/ca_lecture_20.html)
+]
 
 ---
 

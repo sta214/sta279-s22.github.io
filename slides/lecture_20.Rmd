@@ -14,6 +14,12 @@ editor_options:
 
 ### Agenda
 
+.large[
+* F tests
+* Degrees of freedom
+* Assumptions
+]
+
 ---
 
 ### Data: flipped classrooms?
@@ -397,18 +403,6 @@ anova(m1)
 ### Approximating the degrees of freedom
 
 .large[
-```{r include=F}
-library(tidyverse)
-set.seed(3)
-mean_scores <- c(rnorm(5, 80, 6), rnorm(5, 87, 6), rnorm(5, 83, 6))
-
-teaching <- data.frame(professor = rep(1:15, each=25),
-           style = factor(rep(c("no flip", "some flip", "full flip"),
-                                 each=125),
-                             levels = c("no flip", "some flip", "full flip"))) %>%
-  mutate(score = rnorm(375, mean = mean_scores[professor], sd = 2),
-         professor = as.factor(professor))
-```
 
 ```{r message=F, warning=F}
 anova(m1)
@@ -430,7 +424,33 @@ Because $\widehat{\rho}_{group}$ is high (0.83)
 
 ---
 
+### Why degrees of freedom matter
+
+.large[
+* If we use the wrong degrees of freedom, we get the wrong p-value
+* Often this means our p-value is smaller than it should be (we overestimate the strength of evidence)
+
+
+Using the correct degrees of freedom: 
+
+```{r}
+pf(7.69, 2, 12, lower.tail=F)
+```
+
+If we just did $n - p$ (wrong):
+
+```{r}
+pf(7.69, 2, 372, lower.tail=F)
+```
+]
+
+---
+
 ### Class activity
+
+.large[
+[https://sta279-s22.github.io/class_activities/ca_lecture_20.html](https://sta279-s22.github.io/class_activities/ca_lecture_20.html)
+]
 
 ---
 
