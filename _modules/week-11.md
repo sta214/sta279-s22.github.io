@@ -11,6 +11,10 @@ March 23
   : [Slides](https://sta279-s22.github.io/slides/lecture_21.html), [Class activity](https://sta279-s22.github.io/class_activities/ca_lecture_21.html)
 
 March 25
+: Random slopes
+  : [Slides](https://sta279-s22.github.io/slides/lecture_22.html)
+
 : **Lab 7**{: .label .label-purple }
+  : [Lab](https://sta279-s22.github.io/labs/lab_7.html)
 
 : **Lab 6 due**{: .label .label-red }

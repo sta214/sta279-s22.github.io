@@ -30,7 +30,7 @@ Anxiety can affect musicians before performances, and can negatively affect thei
 The following code imports the data and saves it as a data frame called `music`:
 
 ```r
-bryozoan <- read_csv("https://sta112-s22.github.io/homework/bryozoan_data.csv")
+music <- read_csv("https://sta279-s22.github.io/labs/music.csv")
 ```
 
 # Part I
