@@ -1,0 +1,217 @@
+---
+title: "Lab 7"
+output: 
+  rmdformats::robobook:
+    css: "homework.css"
+    highlight: pygments
+link-citations: yes
+---
+
+**Due:** Friday, April 1, 12:00pm (noon) on Canvas
+
+A template R Markdown file is provided: [lab_07_template.Rmd](https://sta279-s22.github.io/labs/lab_07_template.Rmd)
+
+When you are done with the lab, submit your knitted HTML file to Canvas.
+
+There are two parts to this lab. In the first, you will practice with mixed effects models. In the second, you will practice with maximum likelihood estimation.
+
+# Data
+
+Anxiety can affect musicians before performances, and can negatively affect their ability to play and their emotional state. In a [2010 study](https://journals.sagepub.com/doi/10.1177/1948550610370492), researchers examined anxiety in 37 undergraduate music majors. For each musician, data was collected on anxiety levels before different performances (between 2 and 15 performances were measured for each musician). Each row in the data represents one performance; in this lab, we will work with the following variables:
+
+* `id`: a unique identifier for the musician
+* `na`: negative affect score (a measure of anxiety)
+* `large`: whether the musician was performing as part of a large ensemble (large = 1), or as part of a small ensemble or solo (large = 0)
+* `audience`: who attended (Instructor, Public, Students, or Juried)
+
+
+### Downloading the data
+
+The following code imports the data and saves it as a data frame called `music`:
+
+```r
+bryozoan <- read_csv("https://sta112-s22.github.io/homework/bryozoan_data.csv")
+```
+
+# Part I
+
+### Fitting a model
+
+The researchers hypothesize that audience type might impact performer anxiety, and that after accounting for audience type, students will be less anxious when performing in large ensembles. Furthermore, the researchers suspect that overall anxiety varies between individuals, but that the effects of audience and ensemble size (large vs. small) are the *same* for each individual
+
+:::{.question}
+#### Question 1
+
+Write down a population model that matches the researchers' hypotheses. Explain why your model captures each of the researchers' suspected effects. Remember to include distributions for the noise and random effect terms in your population model.
+
+:::
+
+:::{.question}
+#### Question 2
+
+Fit the model from Question 1, and report the estimated parameters (the $\beta$ s and the variance terms).
+:::
+
+:::{.question}
+#### Question 3
+
+Does the fitted model support the researchers' hypothesis that after accounting for audience type, students will be less anxious when performing in large ensembles? Explain your answer.
+:::
+
+:::{.question}
+#### Question 4
+
+Does the fitted model support the researchers' hypothesis that there is variability in anxiety between students? Calculate a statistic that supports your answer, and explain your reasoning.
+:::
+
+### Assumption diagnostics
+
+We would like to test whether students are less nervous before large ensemble performances. But before we do inference, we should check our model assumptions.
+
+Our linear mixed effects model makes similar assumptions to usual linear regression models: shape, constant variance, independence, normality, and randomness. As with linear regression, we can assess the shape, constant variance, and normality assumptions with diagnostic plots. 
+
+:::{.question}
+#### Question 5
+
+Create a residual plot for your fitted model from Question 2, and use it to assess the shape and constant variance assumptions.
+
+*Hint: as with linear regression in R, you can get predicted values from a model with `predict(...)`, and residuals with `residuals(...)`*
+:::
+
+We assume normality for both the noise and the random effects. As in linear regression, we can assess the normality assumptions with QQ plots.
+
+:::{.question}
+#### Question 6
+
+Create a QQ plot for your residuals, and use it to assess the normality of the noise term $\varepsilon_{ij}$.
+
+:::
+
+Now we need to assess normality for the random effect, which means we need to estimate the random effect for each group. This can be done by the `coef(...)` function in R.
+
+Suppose our model is called `m1`. Then, `coef(m1)` provides the estimated coefficients for each group in the data. In this model, the grouping variable is called `id`, and the random effect is a random intercept. So we can get the estimated intercepts for each student by
+
+```{r eval=F}
+coef(m1)$id[,1]  ## the intercept is in the first column
+```
+
+To get the estimated random effect, we just have to subtract the estimate $\widehat{\beta}_0$, which is 14.978 for this model. So,
+
+```{r eval=F}
+coef(m1)$id[,1] - 14.978 
+```
+
+gives the estimated random effect for each student.
+
+:::{.question}
+#### Question 7
+
+Run the following code to create a QQ plot for the random effects:
+
+```{r eval=F}
+data.frame(random_effects = coef(m1)$id[,1] - 14.978) %>%
+  ggplot(aes(sample = random_effects)) +
+  geom_qq() +
+  geom_qq_line() +
+  labs(x = "Theoretical normal quantiles",
+       y = "Observed random effect quantiles") +
+  theme_bw()
+```
+
+Does the normality assumption seem reasonable for the random effect?
+
+:::
+
+### Inference
+
+We will begin by using an F test to test whether student anxiety is different before large ensemble performances vs. small/solo performances. We will use our model from questions 1 and 2.
+
+:::{.question}
+#### Question 8
+
+Write down the null and alternative hypotheses, in terms of one or more model parameters. What are the numerator degrees of freedom for the F test?
+
+:::
+
+:::{.question}
+#### Question 9
+
+What are the upper and lower bounds on the denominator degrees of freedom? Do you expect the denominator degrees of freedom will be more similar to the upper or lower bound? Explain your reasoning.
+
+:::
+
+How do we actually carry out the test? Depending on the hypotheses, we have some different options:
+
+* Use the `lmerTest` package, which is good for testing single variables or single parameters. `lmerTest` uses Satterthwaite's approximation for the denominator degrees of freedom
+* Use the `pbkrtest` package, which is good for comparing nested models with an approximate F-test, using the Kenward-Roger approximation for the denominator degrees of freedom
+
+In this case, we want to test whether a single parameter is equal to 0, so either test could be used. Let's try them both.
+
+* First, load the `lmerTest` and `pbkrtest` packages.
+* Fit the two models we want to compare (I'll call them `m1` and `m2`):
+
+```{r eval=F}
+m1 <- lmer(na ~ audience + large + (1 | id), data = music)
+m2 <- lmer(na ~ audience + (1 | id), data = music)
+```
+
+* To test the hypothesis with an approximate F test using Satterthwaite's method, run `summary(m1)`. The summary output for the fixed effects includes an estimated degrees of freedom and p-value for each parameter in the model. The degrees of freedom and p-value associated with `large` are what we want.
+* To test the hypothesis with an approximate F test using the Kenward-Roger method, run `KRmodcomp(m1, m2)`. This will report estimated degrees of freedom and a p-value.
+
+:::{.question}
+#### Question 10
+
+Report the p-values and degrees of freedom from the two methods. Are they similar?
+
+:::
+
+:::{.question}
+#### Question 11
+
+In this case, we can choose either method for carrying out the hypothesis test. Do we have evidence that student anxiety is different before large ensemble performances vs. small/solo performances?
+
+:::
+
+### Adding random slopes
+
+Now researchers suspect that actually, the effects of audience and ensemble size (large vs. small) are *different* for each individual. To capture they additional variation, they will add a random slope to the model, so the effect of ensemble size can vary between students.
+
+:::{.question}
+#### Question 12
+
+Add the appropriate random slopes to your population model from question 1. Remember to include distributions for the noise and random effect terms in your population model.
+
+:::
+
+:::{.question}
+#### Question 13
+
+Fit the model from Question 12, and report the estimated parameters (the $\beta$ s and the variance terms, and the correlation between the random effects).
+:::
+
+:::{.question}
+#### Question 14
+
+Interpret the estimated correlation between the random effects, $\widehat{\rho}_{uv}$.
+:::
+
+# Part II
+
+When we fit a mixed effects model, we need to estimate variance terms. How do we estimate a variance? When we assume a distribution (like the normal distribution for the noise and random effects), we can use maximum likelihood estimation. In practice, maximum likelihood estimation for a mixed effects model is a bit complicated, so we will ignore potential covariates in this lab. We will focus on maximum likelihood estimation for the variance of a normal distribution.
+
+Suppose that $Y_i \sim N(0, \sigma^2)$, and we observe a sample of $n$ observations $Y_1,...,Y_n$. Then, for an estimate $\widehat{\sigma}^2$, the likelihood is
+
+$L(\widehat{\sigma}^2) = \prod \limits_{i=1}^n \dfrac{1}{\sqrt{2\pi \widehat{\sigma}^2}} \exp\left\lbrace -\dfrac{Y_i^2}{2\widehat{\sigma}^2} \right\rbrace$
+
+Note:
+
+* Here $\pi$ is actually the number (3.14159...), *not* a parameter
+* The parameter of interest is $\sigma^2$, *not* $\sigma$. So when you take the derivative of the log likelihood, it is with respect to $\widehat{\sigma}^2$
+
+
+:::{.question}
+#### Question 15
+
+Calculate the maximum likelihood estimate of $\sigma^2$. Show all your steps.
+
+:::
