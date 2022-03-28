@@ -456,6 +456,10 @@ new_metabolic <- 0.175 +
 
 ### Class activity, Part I
 
+.large[
+[https://sta279-s22.github.io/class_activities/ca_lecture_23.html](https://sta279-s22.github.io/class_activities/ca_lecture_23.html)
+]
+
 ---
 
 ### Class activity
@@ -680,3 +684,6 @@ Are there systematic differences between runs (group effects), or are observed d
 
 ### Class activity, Part II
 
+.large[
+[https://sta279-s22.github.io/class_activities/ca_lecture_23.html](https://sta279-s22.github.io/class_activities/ca_lecture_23.html)
+]
