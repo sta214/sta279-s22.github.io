@@ -1,0 +1,111 @@
+---
+title: "Class Activity, March 30"
+output: 
+  tufte::tufte_html:
+    css: "lab.css"
+    tufte_variant: "envisioned"
+    highlight: pygments
+link-citations: yes
+---
+
+Anxiety can affect musicians before performances, and can negatively affect their ability to play and their emotional state. In a [2010 study](https://journals.sagepub.com/doi/10.1177/1948550610370492), researchers examined anxiety in 37 undergraduate music majors. For each musician, data was collected on anxiety levels before different performances (between 2 and 15 performances were measured for each musician). Each row in the data represents one performance, and variables include
+
+* `id`: a unique identifier for the musician
+* `na`: negative affect score (a measure of anxiety)
+* `large`: whether the musician was performing as part of a large ensemble (large = 1), or as part of a small ensemble or solo (large = 0)
+
+**Question:** Are there systematic differences in anxiety between musicians, or are observed differences due to chance?
+
+To answer this question, we will conduct a simulation, in which we generate new data under the assumption that there are *no* systematic differences in anxiety between musicians.
+
+### Data
+
+The following code imports the data and saves it as a data frame called music:
+
+```{r eval=F}
+music <- read_csv("https://sta279-s22.github.io/labs/music.csv")
+```
+
+# Part I
+
+Last time, you created a boxplot showing the distribution of anxiety for each musician, and you simulated data from an intercept-only linear model (with no random effect). Here is the code you used last time:
+
+**Boxplot:**
+
+```{r eval=F}
+music %>%
+  ggplot(aes(x = as.factor(id),
+             y = na)) +
+  geom_boxplot() +
+  theme_bw() +
+  labs(x = "Musician",
+       y = "Anxiety")
+```
+
+**Fitting models:**
+
+```{r eval=F}
+# random intercepts model
+m1 <- lmer(na ~ (1|id), data = music)
+summary(m1)
+
+# intercept-only linear model
+m0 <- lm(na ~ 1, data = music)
+summary(m0)
+```
+
+**Simulating new data:**
+
+```{r eval=F}
+new_na <- 16.21 +
+  rnorm(n=497, mean=0, sd=5.237)
+
+new_data <- data.frame(id = music$id,
+                       na = new_na)
+```
+
+Now that we have our simulated data, we need to compare to the observed data.
+
+1. Create a boxplot showing the distribution of anxiety for each musician in the simulated data.
+
+2. Fit the random intercepts model with the *simulated* data, and report the estimated intra-class correlation.
+
+3. Compare exercises 1 and 2 to your results from the observed data. Does your simulation support the hypothesis that there are systematic differences in anxiety between musicians?
+
+
+# Part II
+
+Now let's simulate many datasets!
+
+4. Fill in the code below to simulate 200 different datasets from the intercept-only linear model, and store the resulting intra-class correlations (the code may take a minute to run):
+
+```{r eval=F}
+nsim <- ...
+iccs <- rep(NA, nsim)  # vector to store the results
+
+# repeat simulation multiple times
+for(sim in ...){
+  new_na <- ...
+
+  new_data <- ...
+  
+  m_sim <- lmer(na ~ (1|id), data = new_data)
+  
+  variance_ests <- as.data.frame(summary(m_sim)$varcor)
+  iccs[sim] <- variance_ests[1,4]/(variance_ests[1,4] + 
+                                     variance_ests[2,4])
+  
+}
+```
+
+5. Make a histogram of the estimated intra-class correlations. To make a quick histogram (without going though `ggplot` ) we can use the `hist` function:
+
+```{r eval=F}
+hist(iccs)
+```
+
+6. For the original music data, $\widehat{\rho}_{group} = 0.18$. Is this correlation unusual, if the intercept-only linear model is correct? Fill in the code below to calculate a p-value summarizing how unusual the observed data is:
+
+```{r eval=F}
+mean(iccs > ...)
+```
