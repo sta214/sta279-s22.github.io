@@ -1,0 +1,269 @@
+---
+title: The Parametric Bootstrap 
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+### Recap
+
+.large[
+
+```{r echo=F, message=F, warning=F, fig.align='center', fig.width=7, fig.height=4.5}
+library(lme4)
+library(tidyverse)
+library(knitr)
+
+hook_output <- knit_hooks$get("output")
+knit_hooks$set(output = function(x, options) {
+   lines <- options$output.lines
+   if (is.null(lines)) {
+     return(hook_output(x, options))  # pass to default hook
+   }
+   x <- unlist(strsplit(x, "\n"))
+   more <- "..."
+   if (length(lines)==1) {        # first n lines
+     if (length(x) > lines) {
+       # truncate the output, but add ....
+       x <- c(head(x, lines), more)
+     }
+   } else {
+     x <- c(more, x[lines], more)
+   }
+   # paste these lines together
+   x <- paste(c(x, ""), collapse = "\n")
+   hook_output(x, options)
+ })
+
+bryozoan <- read_csv("https://sta112-s22.github.io/homework/bryozoan_data.csv")
+bugula_early <- bryozoan %>%
+  filter(Stage == "early", Species == "bugula")
+
+bugula_early %>%
+  ggplot(aes(x = as.factor(Run), y = Metabolic)) +
+  geom_boxplot(lwd=1) +
+  theme_bw() +
+  labs(x = "Run") +
+  theme(text = element_text(size = 25))
+```
+
+.question[
+Are observed differences in runs due to systematic variation between runs, or just random chance?
+]
+]
+
+---
+
+### Strategy
+
+.large[
+**Step 0:** Compare full and reduced models on the observed data
+
+**Full model:** 
+
+$$Metabolic_{ij} = \beta_0 + u_i + \varepsilon_{ij} \hspace{1cm} u_i \overset{iid}{\sim} N(0, \sigma_u^2), \ \ \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$$
+
+**Reduced model:**
+
+$$Metabolic_{ij} = \beta_0 + \varepsilon_{ij} \hspace{1cm} \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$$
+
+.question[
+Do the full and reduced models correspond to hypotheses about one or more model parameters?
+]
+
+]
+
+---
+
+### Strategy
+
+.large[
+**Step 0:** Compare full and reduced models on the observed data
+
+**Full model:** 
+
+$$Metabolic_{ij} = \beta_0 + u_i + \varepsilon_{ij} \hspace{1cm} u_i \overset{iid}{\sim} N(0, \sigma_u^2), \ \ \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$$
+
+**Reduced model:**
+
+$$Metabolic_{ij} = \beta_0 + \varepsilon_{ij} \hspace{1cm} \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$$
+
+**Hypotheses:**
+
+$H_0: \sigma_u^2 = 0$ (reduced model)
+
+$H_A: \sigma_u^2 > 0$ (full model)
+
+**Goal:** Calculate a p-value to test these hypotheses
+
+]
+
+---
+
+### Strategy
+
+.large[
+**Step 1:** Fit full and reduced models on the *observed* data
+
+**Full model:** 
+
+$\widehat{\beta}_0 = 0.175$, $\hspace{0.5cm} \widehat{\sigma}_u^2 = 0.00013$, $\hspace{0.5cm} \widehat{\sigma}_\varepsilon^2 = 0.0042$
+
+$\widehat{\rho}_{group} = \dfrac{0.00013}{0.00013 + 0.0042} = 0.03$
+
+**Reduced model:** 
+
+$\widehat{\beta}_0 = 0.175, \hspace{0.5cm} \widehat{\sigma}_\varepsilon^2 = 0.0043$
+]
+
+---
+
+### Strategy
+
+.large[
+**Step 2:** Simulate data from the *reduced* model
+
+$$Metabolic_{ij}^* = 0.175 + \varepsilon_{ij}^* \hspace{1cm} \varepsilon_{ij}^* \overset{iid}{\sim} N(0, \ 0.0043)$$
+
+```{r eval=F}
+new_metabolic <- 0.175 +
+  rnorm(n=197, mean=0, sd=sqrt(0.0043))
+```
+
+.question[
+Why do we simulate data from the *reduced* model?
+]
+]
+
+--
+
+.large[
+The p-value is the probability of "our data or more extreme", *if $H_0$ is true*. So we need to simulate data under the null hypothesis
+]
+
+---
+
+### Strategy
+
+.large[
+**Step 3:** Calculate a test statistic on the *simulated* data
+
+.question[
+What statistic have we been using?
+]
+]
+
+--
+
+.large[
+intra-class correlation
+
+**Fitted random intercepts model (simulated data):**
+
+$\widehat{\beta}_0 = 0.169$, $\hspace{0.5cm} \widehat{\sigma}_u^2 = 0.00015$, $\hspace{0.5cm} \widehat{\sigma}_\varepsilon^2 = 0.0049$, $\ \ \widehat{\rho}_{group} = 0.03$
+]
+
+---
+
+### Strategy
+
+.large[
+**Step 4:** Repeat steps 2 and 3 many times, and store the resulting test statistics
+
+```{r eval=F}
+nsim <- ...
+iccs <- rep(NA, nsim)  # vector to store the results
+
+# repeat simulation multiple times
+for(sim in 1:nsim){
+  # code from steps 2 and 3 goes here!
+  
+  iccs[sim] <- ...
+}
+```
+]
+
+---
+
+### Strategy
+
+.large[
+**Step 4:** Repeat steps 2 and 3 many times, and store the resulting test statistics
+
+```{r sim_data, include=F, cache=T}
+set.seed(3)
+
+nsim <- 200  # do 200 repetitions
+iccs <- rep(NA, nsim)  # vector to store the results
+
+# repeat simulation multiple times
+for(sim in 1:nsim){
+  new_metabolic <- 0.175 +
+  rnorm(n=197, mean=0, sd=sqrt(0.0043))
+
+  new_data <- data.frame(Run = bugula_early$Run, 
+                         Metabolic = new_metabolic)
+  
+  m_sim <- lmer(Metabolic ~ (1|Run), data = new_data)
+  
+  variance_ests <- as.data.frame(summary(m_sim)$varcor)
+  iccs[sim] <- variance_ests[1,4]/(variance_ests[1,4] + 
+                                     variance_ests[2,4])
+  
+}
+```
+
+```{r echo=F, message=F, fig.align='center', fig.width=8, fig.height=3.5}
+data.frame(icc = iccs) %>%
+  ggplot(aes(x = icc)) +
+  geom_histogram(bins = 15) +
+  theme_bw() +
+  theme(text = element_text(size=25)) +
+  labs(x = "Intra-class correlation")
+```
+]
+
+---
+
+### Strategy
+
+.large[
+**Step 5:** Compare the test statistic for the *observed* data to the test statistics for the *simulated* data, and calculate a p-value
+
+```{r echo=F, message=F, fig.align='center', fig.width=8, fig.height=3.5}
+data.frame(icc = iccs) %>%
+  ggplot(aes(x = icc)) +
+  geom_histogram(bins = 15) +
+  theme_bw() +
+  theme(text = element_text(size=25)) +
+  labs(x = "Intra-class correlation")
+```
+
+Observed statistic: $\widehat{\rho}_{group} = 0.03$
+
+p-value: 0.15
+
+So we have pretty weak evidence that $\sigma_u^2 > 0$
+]
+
+---
+
+### Parametric Bootstrapping
+
+.large[
+Parametric bootstrap for nested hypothesis testing:
+
+* **Step 0:** Specify hypotheses, and the full and reduced models
+* **Step 1:** Fit the full and reduced models on the *observed* data, and calculate a test statistic (for example, an F statistic or drop in deviance)
+* **Step 2:** Simulate data from the *reduced* model (i.e., pretend $H_0$ is true)
+* **Step 3:** Fit the full and reduced models on the *simulated* data, and calculate the test statistic again
+* **Step 4:** Repeat steps 2 and 3 many times, and store the resulting test statistics
+* **Step 5:** Compare the test statistic for the *observed* data to the test statistics for the *simulated* data, and calculate a p-value
+]

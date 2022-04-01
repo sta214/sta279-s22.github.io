@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>The Parametric Bootstrap</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link rel="stylesheet" href="lab-slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# The Parametric Bootstrap
+
+---
+
+
+### Recap
+
+.large[
+
+&lt;img src="lecture_25_files/figure-html/unnamed-chunk-1-1.png" style="display: block; margin: auto;" /&gt;
+
+.question[
+Are observed differences in runs due to systematic variation between runs, or just random chance?
+]
+]
+
+---
+
+### Strategy
+
+.large[
+**Step 0:** Compare full and reduced models on the observed data
+
+**Full model:** 
+
+`$$Metabolic_{ij} = \beta_0 + u_i + \varepsilon_{ij} \hspace{1cm} u_i \overset{iid}{\sim} N(0, \sigma_u^2), \ \ \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$$`
+
+**Reduced model:**
+
+`$$Metabolic_{ij} = \beta_0 + \varepsilon_{ij} \hspace{1cm} \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$$`
+
+.question[
+Do the full and reduced models correspond to hypotheses about one or more model parameters?
+]
+
+]
+
+---
+
+### Strategy
+
+.large[
+**Step 0:** Compare full and reduced models on the observed data
+
+**Full model:** 
+
+`$$Metabolic_{ij} = \beta_0 + u_i + \varepsilon_{ij} \hspace{1cm} u_i \overset{iid}{\sim} N(0, \sigma_u^2), \ \ \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$$`
+
+**Reduced model:**
+
+`$$Metabolic_{ij} = \beta_0 + \varepsilon_{ij} \hspace{1cm} \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$$`
+
+**Hypotheses:**
+
+`\(H_0: \sigma_u^2 = 0\)` (reduced model)
+
+`\(H_A: \sigma_u^2 &gt; 0\)` (full model)
+
+**Goal:** Calculate a p-value to test these hypotheses
+
+]
+
+---
+
+### Strategy
+
+.large[
+**Step 1:** Fit full and reduced models on the *observed* data
+
+**Full model:** 
+
+`\(\widehat{\beta}_0 = 0.175\)`, `\(\hspace{0.5cm} \widehat{\sigma}_u^2 = 0.00013\)`, `\(\hspace{0.5cm} \widehat{\sigma}_\varepsilon^2 = 0.0042\)`
+
+`\(\widehat{\rho}_{group} = \dfrac{0.00013}{0.00013 + 0.0042} = 0.03\)`
+
+**Reduced model:** 
+
+`\(\widehat{\beta}_0 = 0.175, \hspace{0.5cm} \widehat{\sigma}_\varepsilon^2 = 0.0043\)`
+]
+
+---
+
+### Strategy
+
+.large[
+**Step 2:** Simulate data from the *reduced* model
+
+`$$Metabolic_{ij}^* = 0.175 + \varepsilon_{ij}^* \hspace{1cm} \varepsilon_{ij}^* \overset{iid}{\sim} N(0, \ 0.0043)$$`
+
+
+```r
+new_metabolic &lt;- 0.175 +
+  rnorm(n=197, mean=0, sd=sqrt(0.0043))
+```
+
+.question[
+Why do we simulate data from the *reduced* model?
+]
+]
+
+--
+
+.large[
+The p-value is the probability of "our data or more extreme", *if `\(H_0\)` is true*. So we need to simulate data under the null hypothesis
+]
+
+---
+
+### Strategy
+
+.large[
+**Step 3:** Calculate a test statistic on the *simulated* data
+
+.question[
+What statistic have we been using?
+]
+]
+
+--
+
+.large[
+intra-class correlation
+
+**Fitted random intercepts model (simulated data):**
+
+`\(\widehat{\beta}_0 = 0.169\)`, `\(\hspace{0.5cm} \widehat{\sigma}_u^2 = 0.00015\)`, `\(\hspace{0.5cm} \widehat{\sigma}_\varepsilon^2 = 0.0049\)`, `\(\ \ \widehat{\rho}_{group} = 0.03\)`
+]
+
+---
+
+### Strategy
+
+.large[
+**Step 4:** Repeat steps 2 and 3 many times, and store the resulting test statistics
+
+
+```r
+nsim &lt;- ...
+iccs &lt;- rep(NA, nsim)  # vector to store the results
+
+# repeat simulation multiple times
+for(sim in 1:nsim){
+  # code from steps 2 and 3 goes here!
+  
+  iccs[sim] &lt;- ...
+}
+```
+]
+
+---
+
+### Strategy
+
+.large[
+**Step 4:** Repeat steps 2 and 3 many times, and store the resulting test statistics
+
+
+
+&lt;img src="lecture_25_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+### Strategy
+
+.large[
+**Step 5:** Compare the test statistic for the *observed* data to the test statistics for the *simulated* data, and calculate a p-value
+
+&lt;img src="lecture_25_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+
+Observed statistic: `\(\widehat{\rho}_{group} = 0.03\)`
+
+p-value: 0.15
+
+So we have pretty weak evidence that `\(\sigma_u^2 &gt; 0\)`
+]
+
+---
+
+### Parametric Bootstrapping
+
+.large[
+Parametric bootstrap for nested hypothesis testing:
+
+* **Step 0:** Specify hypotheses, and the full and reduced models
+* **Step 1:** Fit the full and reduced models on the *observed* data, and calculate a test statistic (for example, an F statistic or drop in deviance)
+* **Step 2:** Simulate data from the *reduced* model (i.e., pretend `\(H_0\)` is true)
+* **Step 3:** Fit the full and reduced models on the *simulated* data, and calculate the test statistic again
+* **Step 4:** Repeat steps 2 and 3 many times, and store the resulting test statistics
+* **Step 5:** Compare the test statistic for the *observed* data to the test statistics for the *simulated* data, and calculate a p-value
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
