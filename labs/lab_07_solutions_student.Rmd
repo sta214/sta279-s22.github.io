@@ -1,0 +1,190 @@
+---
+title: "Lab 7 Solutions"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(pbkrtest)
+music <- read_csv("https://sta279-s22.github.io/labs/music.csv")
+```
+
+### Question 1
+
+$$Anxiety_{ij} = \beta_0 + \beta_1 Juried_{ij} + \beta_2 Public_{ij} + \beta_3 Student_{ij} + \beta_4 Large_{ij} + u_i + \varepsilon_{ij}$$
+
+$u_i \overset{iid}{\sim} N(0, \sigma_u^2)$, $\varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$
+
+* The researchers think that audience type and ensemble size may be related to anxiety, so we include those as fixed effects
+* The researchers suspect that there is variation in anxiety between musicians, so we include a random intercept ($u_i$) that captures variability. We're not including a random slope (yet) because the researchers assume that the effects of audience type and ensemble size (i.e. $\beta_1$,...,$\beta_4$) are the same for every musician
+
+### Question 2 
+
+```{r}
+m1 <- lmer(na ~ audience + large + (1|id), data = music)
+summary(m1)
+```
+
+Estimated fixed effects:
+
+* $\widehat{\beta}_0 = 14.98$
+* $\widehat{\beta}_1 = 3.76$
+* $\widehat{\beta}_2 = 2.20$
+* $\widehat{\beta}_3 = 3.19$
+* $\widehat{\beta}_4 = -2.23$
+
+Estimated variance parameters:
+
+* $\widehat{\sigma_u}^2 = 6.06$
+* $\widehat{\sigma}_\varepsilon^2 = 20.29$
+
+### Question 3 
+
+Holding audience type fixed, we estimate that student anxiety is 2.23 points lower before large ensemble performances, vs. small ensemble performances. This supports the researchers' hypothesis that students are less nervous when performing in large ensembles.
+
+
+### Question 4 
+
+The estimated intra-class correlation is $\widehat{\rho}_{group} = \dfrac{6.06}{6.06 + 20.29} = 0.23$. That is, after accounting for audience type and ensemble size, about 23% of variability in anxiety levels is due to differences in anxiety between musicians. This is a moderate intra-class correlation, and suggests that there may be systematic variability in anxiety between students.
+
+
+
+### Question 5 
+
+```{r}
+music %>%
+  mutate(preds = predict(m1),
+         resids = residuals(m1)) %>%
+  ggplot(aes(x = preds, y = resids)) +
+  geom_point() +
+  geom_abline(slope = 0, intercept = 0, color = "blue") +
+  labs(x = "Predicted anxiety",
+       y = "Residual") +
+  theme_bw()
+```
+
+The shape assumption looks like it might be ok, but the constant variance assumption is violated -- we can see that the variance of the residuals increases with the predicted anxiety. In a more in-depth analysis we would want to experiment with transformations, but for the purposes of this lab we don't.
+
+
+
+### Question 6 
+
+```{r}
+music %>%
+  mutate(resids = residuals(m1)) %>%
+  ggplot(aes(sample = resids)) +
+  geom_qq() +
+  geom_qq_line(color = "blue") +
+  labs(x = "Theoretical normal quantiles",
+       y = "Observed residual quantiles") +
+  theme_bw()
+```
+
+The normality assumption for the residuals is violated here -- we can see that the residuals are right-skewed, rather than normal.
+
+### Question 7 
+
+```{r}
+data.frame(random_effects = coef(m1)$id[,1] - 14.978) %>%
+  ggplot(aes(sample = random_effects)) +
+  geom_qq() +
+  geom_qq_line() +
+  labs(x = "Theoretical normal quantiles",
+       y = "Observed random effect quantiles") +
+  theme_bw()
+```
+
+The normality assumption for the random effect is slightly violated (note the left tail), but overall isn't too bad. I wouldn't be too concerned about the degree of violation here.
+
+### Question 8 
+
+$H_0: \beta_4 = 0$
+
+$H_A: \beta_4 \neq 0$
+
+Numerator degrees of freedom: 1 (we are only testing one parameter)
+
+
+
+### Question 9
+
+The lower bound is $\# \text{groups} - p$ (where $p$ is the number of parameters in the full model), and the upper bound is $n - p$ (where $n$ is the number of observations in the data). There are 37 groups (musicians), and 5 parameters in the full model, so the lower bound is 32. There are 497 observations, so the upper bound is 492.
+
+The intra-class correlation isn't super high, so the estimated degrees of freedom might be more similar to the upper bound. (Though to be fair, it is hard to predict what the estimated degrees of freedom will actually be)
+
+
+
+### Question 10
+
+```{r}
+m1 <- lmer(na ~ audience + large + (1 | id), data = music)
+m2 <- lmer(na ~ audience + (1 | id), data = music)
+
+summary(m1)
+KRmodcomp(m1, m2)
+```
+
+The p-values and degrees of freedom are similar. For the Satterthwaite method, the p-value is 0.00067, with denominator df 491.14. For the Kenward-Roger method, the p-value is 0.00070, with denominator df 491.11.
+
+In many cases, the two methods produce very similar results.
+
+
+### Question 11
+
+Yes, we have strong evidence that student anxiety is different before large ensemble performances vs. small/solo performances, because our p-value is close to 0.
+
+
+### Question 12
+
+$$Anxiety_{ij} = \beta_0 + \beta_1 Juried_{ij} + \beta_2 Public_{ij} + \beta_3 Student_{ij} + (\beta_4 + v_i) Large_{ij} + u_i + \varepsilon_{ij}$$
+
+$\varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2) \hspace{1cm} \begin{bmatrix} u_i \\ v_i \end{bmatrix} \overset{iid}{\sim} N \left( \begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix} \sigma_u^2 & \rho_{uv}\sigma_u \sigma_v \\ \rho_{uv}\sigma_u \sigma_v & \sigma_v^2 \end{bmatrix} \right)$
+
+### Question 13 
+
+```{r}
+m1 <- lmer(na ~ audience + large + (large|id), data = music)
+summary(m1)
+```
+
+* $\widehat{\beta}_0 = 14.96$
+* $\widehat{\beta}_1 = 3.87$
+* $\widehat{\beta}_2 = 2.28$
+* $\widehat{\beta}_3 = 3.28$
+* $\widehat{\beta}_4 = -2.18$
+* $\widehat{\sigma}_u^2 = 7.32$
+* $\widehat{\sigma}_v^2 = 2.54$
+* $\widehat{\rho}_{uv} = -0.64$
+* $\widehat{\sigma}_\varepsilon^2 = 19.89$
+
+
+### Question 14 
+
+Students with higher anxiety before small performances in front of instructors tend to have a greater decrease in anxiety before large ensemble performances. (The point is that $\widehat{\rho}_{uv} < 0$, so positive $u_i$ is associated with negative $v_i$)
+
+
+### Question 15 
+
+\begin{align}
+\log L(\widehat{\sigma}^2) &= \sum \limits_{i=1}^n \log \left( \dfrac{1}{\sqrt{2 \pi \widehat{\sigma}^2}} e^{-\frac{Y_i^2}{2 \widehat{\sigma}^2}} \right) \\
+&= \sum \limits_{i=1}^n -\frac{1}{2} \log(2 \pi \widehat{\sigma}^2) + \sum\limits_{i=1}^n -\dfrac{Y_i^2}{2 \widehat{\sigma}^2}
+\end{align}
+
+Differentiating,
+
+\begin{align}
+\frac{d}{d \widehat{\sigma}^2} \log L(\widehat{\sigma}^2) &= \sum \limits_{i=1}^n -\dfrac{1}{2 \widehat{\sigma}^2} + \sum \limits_{i=1}^n \dfrac{Y_i^2}{2 \widehat{\sigma}^4}
+\end{align}
+
+Setting equal to 0, 
+
+$\sum \limits_{i=1}^n \dfrac{Y_i^2}{2 \widehat{\sigma}^4} = \sum \limits_{i=1}^n \dfrac{1}{2 \widehat{\sigma}^2} = \dfrac{n}{2\widehat{\sigma}^2}$
+
+Thus,
+
+$\widehat{\sigma}^2 = \frac{1}{n} \sum \limits_{i=1}^n Y_i^2$
+
+

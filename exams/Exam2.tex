@@ -1,0 +1,397 @@
+\documentclass[11pt]{article}
+\usepackage[top=2cm,bottom=2cm,left=1.75cm,right= 1.75cm]{geometry}
+%\geometry{landscape}                % Activate for for rotated page geometry
+\usepackage[parfill]{parskip}    % Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{hyperref}
+%\usepackage{changepage}
+\usepackage{lscape}
+%\usepackage{ulem}
+\usepackage{multicol}
+\usepackage{setspace}
+\usepackage{dashrule}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{enumerate}
+\usepackage{enumitem}
+\newcommand{\urlwofont}[1]{\urlstyle{same}\url{#1}}
+\newcommand{\degree}{\ensuremath{^\circ}}
+\newcommand{\hl}[1]{\textbf{\underline{#1}}}
+\newcommand\given[1][]{\:#1\vert\:}
+
+% footnote citation
+\usepackage[style=authortitle-ibid, maxnames=3,natbib=true,sortcites=true,block=space]{biblatex}
+\bibliography{final}
+
+% color hyperlinks
+%\usepackage[colorlinks=false,pdfborder={0 0 0},urlcolor= MidnightBlue,colorlinks=true,linkcolor= MidnightBlue, citecolor= MidnightBlue,backref=true]{hyperref}
+
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\newenvironment{choices}{
+\begin{enumerate}[(a)]
+}{\end{enumerate}}
+
+%\newcommand{\soln}[2]{\textcolor{MidnightBlue}{\textit{#2}}}{} 		% solutions
+\newcommand{\soln}[2]{\vspace{#1}}{}						% exam, handout, etc.
+
+%\newcommand{\solnMult}[1]{\textbf{\textcolor{MidnightBlue}{\textit{#1}}}}	% uncomment for solutions
+\newcommand{\solnMult}[1]{ #1 }	% uncomment for handouts
+
+%\newcommand{\tf}[1]{ \textbf{\textcolor{MidnightBlue}{\textit{#1}}} }	% uncomment for solutions
+\newcommand{\tf}[1]{}	% uncomment for handouts
+
+%\newcommand{\pts}[1]{ \textbf{{\small \textcolor{BurntOrange}{(#1)}}} }	% uncomment for solutions
+\newcommand{\pts}[1]{ \textbf{{\small \textcolor{black}{(#1)}}} }	% uncomment for handouts
+
+\newcommand{\note}[1]{ \textbf{\textcolor{red}{[#1]}} }	% uncomment for handouts
+
+\newcommand{\qt}[1]{\textcolor{RoyalBlue}{\textbf{\textit{#1.}}}}
+
+\renewcommand{\emph}[1]{\underline{\textbf{#1}}}
+
+\newcommand{\reference}[1]{ \textbf{\textcolor{red}{[#1]}} }
+
+%\newcommand{\fb}[3]{
+%  \textcolor{NavyBlue}{\textbf{Question Feedback:} #1} \\$\:$\\
+%  \textcolor{NavyBlue}{\textbf{This question refers to the following learning objective(s):}\\
+%  \textbf{\textit{#2:}} #3}
+%}
+
+
+\begin{document}
+
+\begin{titlepage}
+
+\enlargethispage{\baselineskip}
+
+
+STA 279 \hfill Dr. Evans \\
+Spring 2022	\hfill Exam 2\\
+
+\vspace{-2cm}
+
+\begin{center}
+{\Huge Exam 2}	
+\end{center}
+
+$\:$ \\
+
+\textbf{Last Name:} \rule{5cm}{0.5pt}	\hfill	 \textbf{First Name:}  \rule{5cm}{0.5pt}	 \\
+$\:$ \\
+%\textbf{Section:} A (11 AM) $\quad$ B (9:30 AM) \hfill	
+%\textbf{Team Name:}  \rule{7cm}{0.5pt} \\
+$\:$ \\
+
+\textit{I hereby state that I have not communicated with or gained information in any way from other students or any outside resource during this exam. I agree to abide by the rules stated below, and to abide by the Wake Forest Honor Code. All work is my own. I understand that any violation of this agreement will be reported to the Honor Council and will result, at minimum, in a 0 on this exam.}
+\[ Signature: \rule{7cm}{0.5pt}\]
+
+\hdashrule[0.5ex]{\textwidth}{0.5pt}{3mm}
+
+\textbf{All work on this exam must be your own.}
+
+{\small
+\begin{enumerate}
+\item You have 50 minutes to complete the exam.
+\item Show all your work on the open ended questions in order to get partial credit. No credit will be given for open ended questions where no work is shown, even if the answer is correct.
+\item You are allowed a calculator, however you may not share a calculator with another student during the exam. The calculator must be only a calculator, and may not be connected to the internet. 
+\item You are allowed to ask clarification questions to me, but you may not ask anyone else. 
+\item You are \hl{not} allowed a cell phone, even if you intend to use it as a calculator or for checking the time. You are \hl{not} allowed a music device or headphones, notes, books, or other resources. 
+\item You may \hl{not} communicate with anyone other than myself during the exam.
+\item Write clearly and be clear. Make it easy to find your answers. 
+\end{enumerate}
+}
+\begin{center}
+{\Large Good luck!}
+\end{center}
+\hdashrule[0.5ex]{\textwidth}{0.5pt}{3mm}
+
+%\begin{center}
+%\includegraphics[width=0.5\textwidth]{../figures/bubbles_new}
+%\end{center}
+
+
+
+\end{titlepage}
+
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+$\:$ \\
+\thispagestyle{empty}
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setcounter{page}{1}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\rule{\textwidth}{1pt}
+%\begin{center}
+%\textit{Answer questions \ref{DriveStart} to \ref{DriveEnd} based on the information %below.} \\
+%\end{center}
+\rule{\textwidth}{0.5pt}
+
+
+\textbf{Part 1} We have a client who is interested in modeling $Y_i =$ the type of major a student $i$ chooses to pursue at a large university. The university in the study has four types of majors: STEM, Business, Education, and Liberal Arts. We have a random sample of $n = 2500$ students from the university, and the table below shows the number of students from each type of major in the sample:
+
+\begin{table}[!h]
+\centering
+\begin{tabular}{rrrr}
+STEM & Business & Education & Liberal Arts \\ \hline 
+703 & 576 & 364 & 857
+\end{tabular}
+\end{table}
+
+The client is interested to see if the choice of major is related to (1) whether or not a student took any AP classes in high school (Yes/ No) and (2) the student's High School GPA.
+
+\rule{\textwidth}{1pt}
+
+\begin{enumerate}
+
+\item Based on the information provided, write down a population model for the relationship between choice of major (response) and AP classes and high school GPA (predictors). You may ignore potential interactions. Use appropriate notation.
+
+
+\vspace{5cm} 
+
+\pagebreak
+
+The client fits the following model.  
+
+\textbf{Model 1} 
+
+\begin{verbatim}
+Coefficients:
+           (Intercept)  APYes       GPA 
+Business    -3.77       0.74       0.95   
+Education   -4.36       1.08       0.74
+STEM        -5.48       1.79       1.03
+
+Residual Deviance: 23.86116 
+\end{verbatim}
+
+\rule{\textwidth}{1pt}
+
+\item Based on the output above, write down the fitted model for business vs. liberal arts. 
+
+
+\vspace{7cm} 
+
+
+\item For a student whose GPA is 3.5 and who has taken an AP class, how many times higher / lower is their predicted probability of choosing an education major versus a liberal arts major? Show your work and write your final answer in a sentence. 
+
+\pagebreak
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\textbf{} 
+
+%\item True or False: When creating your multinomial regression line, it is very important to make sure you estimate your coefficients ($\hat{\beta}$ terms) by (1) taking multiple samples with replacement from your original sample, (2) fitting the regression model to each sample, (3) finding the estimated coefficients, and (4) averaging the values together to obtain your estimated coefficients.
+
+%\item For an individual with no kids who is active 1 hour a day and has a house with a yard, we estimate that the probability of choosing a mature dog is  _______________ the probability of choosing a dog 1-3 years in age. 
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%\textbf{Model 1} 
+%
+%\begin{verbatim}
+%Coefficients:
+%           (Intercept)  APYes       GPA 
+%Business    -3.77       0.74       1.41   
+%Education   -6.36       1.748      0.74
+%STEM        -5.48       3.79       2.03
+%
+%Residual Deviance: 23.86116 
+%\end{verbatim}
+%
+%
+%\rule{\textwidth}{1pt}
+%
+%
+%\item Based on the results, which major is a person who is first generation and has a 3.8 high school most likely to choose? Show your work.
+%
+%
+%
+%
+%\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\textbf{Model 1} 
+
+\begin{verbatim}
+Coefficients:
+           (Intercept)  APYes       GPA 
+Business    -3.77       0.74       0.95   
+Education   -4.36       1.08       0.74
+STEM        -5.48       1.79       1.03
+
+Residual Deviance: 23.86116 
+\end{verbatim}
+
+\rule{\textwidth}{1pt}
+
+\item What is the predicted probability of choosing a liberal arts major, for a student with a GPA of 3.5 who has taken an AP class? Show your work.
+
+\vspace{6cm}
+
+\item For a person who has taken an AP class, what is the minimum high school GPA they need in order for the model to predict that they are more likely to choose a business major over a liberal arts major? Show your work. 
+
+
+\pagebreak
+
+To assess performance of the fitted model, you create this confusion matrix.
+
+\begin{table}[]
+\centering
+\begin{tabular}{|cc|cccc|}
+\hline
+\multicolumn{2}{|c|}{\multirow{2}{*}{}}                         & \multicolumn{4}{c|}{Actual}                                                                               \\ \cline{3-6} 
+\multicolumn{2}{|c|}{}                                          & \multicolumn{1}{c|}{Liberal arts} & \multicolumn{1}{c|}{Business} & \multicolumn{1}{c|}{Education} & STEM \\ \hline
+\multicolumn{1}{|c|}{\multirow{4}{*}{Predicted}} & Liberal arts & \multicolumn{1}{c|}{502}          & \multicolumn{1}{c|}{256}      & \multicolumn{1}{c|}{297}       & 158  \\ \cline{2-6} 
+\multicolumn{1}{|c|}{}                           & Business     & \multicolumn{1}{c|}{355}          & \multicolumn{1}{c|}{320}      & \multicolumn{1}{c|}{67}        & 545  \\ \cline{2-6} 
+\multicolumn{1}{|c|}{}                           & Education    & \multicolumn{1}{c|}{0}            & \multicolumn{1}{c|}{0}        & \multicolumn{1}{c|}{0}         & 0    \\ \cline{2-6} 
+\multicolumn{1}{|c|}{}                           & STEM         & \multicolumn{1}{c|}{0}            & \multicolumn{1}{c|}{0}        & \multicolumn{1}{c|}{0}         & 0    \\ \hline
+\end{tabular}
+\end{table}
+
+\rule{\textwidth}{1pt}
+
+\item Is the model doing a good job predicting student majors? Your answer should include at least one summary measure of the confusion matrix, and should compare against the two types of random guessing discussed in class:
+\begin{itemize}
+\item Randomly assign each student to one of the four majors, with a 1/4 probability for each major
+\item Assign all students to the most common major
+\end{itemize}
+
+\pagebreak
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\rule{\textwidth}{1pt}
+
+\textbf{Part 2:} We have data on the amount of time (in days, with decimals denoting part of a day) that it takes a cat to be adopted from the Texas animal shelter system. We have a random sample of 500 cats from 10 shelters, composed of 40 - 70 cats per shelter. Staff at the shelter system are interested in how (1) the number of pictures posted about a cat and (2) whether the cat is given a name impacts the amount of time it takes a chat to be adopted. Staff suspect that there is variation in adoption times from shelter to shelter, but the effects of posting pictures or naming cats are the same for each shelter.
+
+The data has 500 rows and the following columns:
+
+\begin{itemize}
+\item \texttt{Shelters}: an ID for the shelter the cat was adopted from
+\item \texttt{NumPictures}: the number of pictures posted of the cat
+\item \texttt{Name}: whether the cat was given a name (1 = yes, 0 = no)
+\item \texttt{Days}: time it took the cat to be adopted
+\end{itemize}
+
+\rule{\textwidth}{1pt}
+
+\item Based on the information we have so far, (1) write down a population model that is appropriate to try and (2) briefly explain why this model is a reasonable choice. Use appropriate notation, and explain what your subscripts (e.g., $i$ and/or $j$) represent. You may assume all necessary conditions are met. 
+
+
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The staff fit the model you suggest and end up with the following output. 
+
+\textbf{Model 1} 
+
+\begin{verbatim}
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ Shelters  (Intercept) 53.9     7.34  
+ Residual              109.2    10.45  
+Number of obs: 500, groups:  Shelters, 10
+
+Fixed effects:
+             Estimate   Std. Error 
+(Intercept)    30.50     0.67      
+NumPictures   -1.89      0.38  
+Name          -7.23      1.56
+\end{verbatim}
+
+\rule{\textwidth}{1pt}
+
+\item Does the fitted model suggest that named cats get adopted more quickly? Explain your reasoning.
+
+\vspace{5cm} 
+
+\item Does the fitted model suggest there is systematic variation in adoption times between shelters, after accounting for the effects of pictures and naming? Calculate a statistic to support your conclusion.
+
+
+\pagebreak
+
+The staff want to test whether there is a difference in adoption times for cats with names vs. cats without names.
+
+\rule{\textwidth}{1pt}
+
+\item Write down null and alternative hypotheses, in terms of one or more model parameters, which allow you to investigate whether there is a difference in adoption times for cats with vs. without names.
+
+\vspace{4cm}
+
+To test your hypotheses from Question 10, the staff fit a second model, which they will compare to the first model with a nested F test:
+
+\textbf{Model 2} 
+
+\begin{verbatim}
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ Shelters  (Intercept) 60.3     7.77
+ Residual              115.7    10.76 
+Number of obs: 500, groups:  Shelters, 10
+
+Fixed effects:
+             Estimate   Std. Error 
+(Intercept)    35.80     0.55      
+NumPictures   -4.30      0.87 
+\end{verbatim}
+
+\vspace{0.5cm}
+
+\item Give the numerator degrees of freedom, and upper and lower bounds on the denominator degrees of freedom, for the nested F test.
+
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Instead of using the F distribution to calculate a p-value, you decide to use a parametric bootstrap.
+
+\rule{\textwidth}{1pt}
+
+\item Describe the additional steps needed to calculate a p-value for the hypotheses in Question 10, using a parametric bootstrap. Provide as much detail as you can, so that someone could turn your description into R code if they wanted to (you do not need to write code, though you may choose to if it helps you explain your procedure). Your description should include details like values for the parameters of the model you will simulate from, how many simulations you will use, how you will calculate a test statistic for each simulation, and how you will calculate a p-value from your bootstrap results at the end.
+
+
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\huge{You are done!!! Whooo!!!!}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\pagebreak
+
+%\hdashrule[0.5ex]{\textwidth}{0.5pt}{3mm}
+%\begin{center}
+%\renewcommand{\arraystretch}{1.5}
+%\begin{tabular}{| l | c | c | c | c | c | c  || c |}
+%\hline
+%				& 		& 		& 		& 		&	&  	&\\
+%				& Q1-Q3		& Q4-6		& Q7		& Q8-Q10		 & Q11-Q12	 & Q13 & Total	\\
+%\hline
+%Points earned		& \textcolor{white}{xxxxx} &	\textcolor{white}{xxxxx}	& \textcolor{white}{xxxxx}	&	\textcolor{white}{xxxxx}&%\textcolor{white}{xxxxx}	&	\textcolor{white}{xxxxx} &	\textcolor{white}{xxxxx} \\
+%\hline
+%Available points	& 9 		& 12		& 9		& 9		&7 & 4 					& 50 \\
+%\hline
+%\end{tabular}
+
+%\end{center}
+
+\end{document}
