@@ -14,6 +14,17 @@ editor_options:
 
 ### Agenda
 
+.large[
+* Project 2 due April 25
+* No assignments due this week
+* No class Friday (holiday)
+* Remaining course components:
+  * Project 2
+  * Lab 9
+  * Final exam
+* Today: start Poisson regression
+]
+
 ---
 
 ### Data
@@ -191,6 +202,10 @@ You saw on a lab that $\widehat{\lambda} = \frac{1}{n} \sum \limits_{i=1}^n Y_i$
 ---
 
 ### Class activity
+
+.large[
+[https://sta279-s22.github.io/class_activities/ca_lecture_26.html](https://sta279-s22.github.io/class_activities/ca_lecture_26.html)
+]
 
 ---
 
@@ -577,7 +592,7 @@ fies %>%
 
 .large[
 $$Y_i \sim Poisson(\lambda_i)$$
-$$\log(\lambda_i) = \beta_0 + \beta_1 Age_i$$
+$$\log(\lambda_i) = \beta_0 + \beta_1 Age_i + \beta_2 Age_i^2$$
 
 **Poisson distribution assumption:** The Poisson distribution is a good choice for $Y_i$.
 

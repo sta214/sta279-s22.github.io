@@ -5,6 +5,8 @@ title: Course wrap-up
 April 25
 : Overdispersion
 
+: **Project 2 due**{: .label .label-red }
+
 April 27
 : ZIP models
 
