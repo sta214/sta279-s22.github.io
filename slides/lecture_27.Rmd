@@ -1,0 +1,499 @@
+---
+title: Poisson Regression 
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+### Agenda
+
+---
+
+### Data
+
+.large[
+A concerned parent asks us to investigate crime rates on college campuses. We have access to data on 81 different colleges and universities in the US, including the following variables:
+
+* `type`: college (C) or university (U)
+* `nv`: the number of violent crimes for that institution in the given year
+* `enroll1000`: the number of enrolled students, in thousands
+* `region`: region of the US C = Central, MW = Midwest, NE = Northeast, SE = Southeast, SW = Southwest, and W = West)
+]
+
+---
+
+### Data
+
+.large[
+We want to know whether there are regional differences in the number of violent crimes on college campuses.
+
+.question[
+What would be a reasonable model to investigate this question?
+]
+]
+
+--
+
+.large[
+$Crimes_i \sim Poisson(\lambda_i)$
+
+$\log(\lambda_i) = \beta_0 + \beta_1 MW_i + \beta_2 NE_i + \beta_3 SE_i + \beta_4 SW_i + \beta_5 W_i$
+]
+
+---
+
+### Model
+
+.large[
+$$Crimes_i \sim Poisson(\lambda_i)$$
+
+$$\log(\lambda_i) = \beta_0 + \beta_1 MW_i + \beta_2 NE_i + \beta_3 SE_i + \beta_4 SW_i + \beta_5 W_i$$
+
+.question[
+What assumptions is this model making?
+]
+]
+
+--
+
+.large[
+* Poisson distribution
+* Independence
+* Not making a shape assumption, because I just have a categorical predictor (so no notion of linearity)
+
+.question[
+How do I assess these assumptions?
+]
+]
+
+---
+
+### Checking assumptions
+
+.large[
+$$Crimes_i \sim Poisson(\lambda_i)$$
+
+$$\log(\lambda_i) = \beta_0 + \beta_1 MW_i + \beta_2 NE_i + \beta_3 SE_i + \beta_4 SW_i + \beta_5 W_i$$
+
+* Poisson assumption:
+  * Check that response is a count
+  * Check that the distribution of the response looks like it could be Poisson
+  * Check that the mean and variance of the response are similar
+* Independence: think about data
+]
+
+---
+
+### Class activity, Part I
+
+---
+
+### Class activity
+
+.large[
+$$\log(\widehat{\lambda}_i) = 1.34 + 0.48 \ MW_i + 0.44 \ NE_i + 0.77 \ SE_i + \\ 0.33 \ SW_i + 0.53 \ W_i$$
+
+.question[
+How do I interpret the estimated intercept 1.34?
+]
+]
+
+--
+
+.large[
+The estimated average number of crimes in a college in the central region is $\exp\{1.34\} = 3.82$.
+]
+
+---
+
+### Class activity
+
+.large[
+$$\log(\widehat{\lambda}_i) = 1.34 + 0.48 \ MW_i + 0.44 \ NE_i + 0.77 \ SE_i + \\ 0.33 \ SW_i + 0.53 \ W_i$$
+
+.question[
+How do I interpret the estimated coefficient 0.48?
+]
+]
+
+--
+
+.large[
+The average number of crimes in a college in the midwest region is $\exp\{0.48\} = 1.62$ times higher than in the central region.
+]
+
+---
+
+### Class activity
+
+.large[
+```{r echo=F, message=F, warning=F, fig.align='center', fig.width=7, fig.height=4}
+library(tidyverse)
+
+crimes <- read_csv("~/Documents/Teaching/sta279-s22.github.io/slides/c_data.csv")
+
+crimes %>%
+  ggplot(aes(x = nv)) +
+  geom_histogram(bins = 10) +
+  labs(x = "Number of crimes") +
+  theme_bw() +
+  theme(text = element_text(size = 25))
+```
+
+.question[
+Does it look reasonable to assume a Poisson distribution for the response?
+]
+]
+
+--
+
+.large[
+It does look like it might be reasonable, since the number of crimes is a count variable and has a unimodal, right skewed distribution.
+]
+
+---
+
+### Class activity
+
+.large[
+```{r}
+mean(crimes$nv)
+var(crimes$nv)
+```
+
+.question[
+Does the Poisson distribution still seem reasonable?
+]
+]
+
+--
+
+.large[
+Not necessarily -- the mean is much lower than the variance. We will see a couple options for handling this issue later.
+]
+
+---
+
+### Goodness of fit
+
+.large[
+Another way to assess whether our model is reasonable is with a *goodness of fit* test.
+
+**Goodness of fit test:** If the model is a good fit for the data, then the residual deviance follows a $\chi^2$ distribution with the same degrees of freedom as the residual deviance
+
+```{r echo=F, message=F, output.lines = 22:23}
+library(knitr)
+hook_output <- knit_hooks$get("output")
+knit_hooks$set(output = function(x, options) {
+   lines <- options$output.lines
+   if (is.null(lines)) {
+     return(hook_output(x, options))  # pass to default hook
+   }
+   x <- unlist(strsplit(x, "\n"))
+   more <- "..."
+   if (length(lines)==1) {        # first n lines
+     if (length(x) > lines) {
+       # truncate the output, but add ....
+       x <- c(head(x, lines), more)
+     }
+   } else {
+     x <- c(more, x[lines], more)
+   }
+   # paste these lines together
+   x <- paste(c(x, ""), collapse = "\n")
+   hook_output(x, options)
+ })
+
+m1 <- glm(nv ~ region, data = crimes, family = poisson)
+summary(m1)
+```
+
+Residual deviance = 621.24, df = 75
+
+.question[
+How likely is a residual deviance of 621.24 if our model is correct?
+]
+]
+
+---
+
+### Goodness of fit
+
+.large[
+**Goodness of fit test:** If the model is a good fit for the data, then the residual deviance follows a $\chi^2$ distribution with the same degrees of freedom as the residual deviance
+
+Residual deviance = 621.24, df = 75
+
+```{r}
+pchisq(621.24, df=75, lower.tail=F)
+```
+
+So our model might not be a very good fit to the data.
+
+.question[
+Why might our model not be a good fit?
+]
+]
+
+---
+
+### Potential issues with our model
+
+.large[
+* The Poisson distribution might not be a good choice
+* There may be additional factors related to the number of violent crimes which we are not including in the model
+
+.question[
+Which other factors might be related to the number of violent crimes?
+]
+]
+
+--
+
+.large[
+The number of students at the school!
+
+* More students means more opportunities for crimes
+]
+
+---
+
+### Offsets
+
+.large[
+We will account for school size by including an **offset** in the model:
+
+$$\log(\lambda_i) = \beta_0 + \beta_1 MW_i + \beta_2 NE_i + \beta_3 SE_i + \beta_4 SW_i + \beta_5 W_i \\ + \log(Enrollment_i)$$
+
+* $\log(Enrollment_i)$ is an *offset*
+* Notice the offset doesn't have a $\beta$ term
+* We are not trying to estimate a relationship between enrollment and the number of crimes; rather, we are just trying to adjust for the school size
+]
+
+---
+
+### Motivation for offsets
+
+.large[
+We can rewrite our regression model with the offset:
+
+$$\log(\lambda_i) = \beta_0 + \beta_1 MW_i + \beta_2 NE_i + \beta_3 SE_i + \beta_4 SW_i + \beta_5 W_i \\ + \log(Enrollment_i)$$
+
+$$\log(\lambda_i) - \log(Enrollment_i) = \beta_0 + \beta_1 MW_i + \beta_2 NE_i + \beta_3 SE_i \\ \hspace{3cm} + \beta_4 SW_i + \beta_5 W_i$$
+
+$$\log \left( \dfrac{\lambda_i}{Enrollment_i} \right) = \beta_0 + \beta_1 MW_i + \beta_2 NE_i + \beta_3 SE_i \\ \hspace{3cm} + \beta_4 SW_i + \beta_5 W_i$$
+
+.question[
+This means the $\beta$s can be interpreted in terms of *rates* (the rate of crime per 1000 students), rather than raw counts
+]
+]
+
+---
+
+### Fitting a model with an offset
+
+.large[
+```{r, output.lines = 10:16}
+m2 <- glm(nv ~ region, offset = log(enroll1000),
+          data = crimes, family = poisson)
+summary(m2)
+```
+
+* The offset doesn't show up in the output (because we're not estimating a coefficient for it)
+]
+
+---
+
+### Fitting a model with an offset
+
+.large[
+$$\log(\widehat{\lambda}_i) = -1.30 + 0.10 MW_i + 0.76 NE_i + \\ 0.87 SE_i + 0.51 SW_i + 0.21 W_i \\  + \log(Enrollment_i)$$
+
+.question[
+How would I interpret the intercept -1.30?
+]
+]
+
+--
+
+.large[
+The estimated crime rate (crimes per 1000 students) in central region schools is $\exp\{-1.30\} = 0.27$
+
+.question[
+What about the coefficient 0.1?
+]
+]
+
+--
+
+.large[
+The estimated crime rate is $\exp\{0.1\} = 1.105$ times higher for midwestern schools than for central schools
+]
+
+---
+
+### When to use offsets
+
+.large[
+Offsets are useful in Poisson regression when our counts come from groups of very different sizes (e.g., different numbers of students on a college campus). The offset lets us interpret model coefficients in terms of rates instead of raw counts.
+
+.question[
+Brainstorm some other data scenarios where our response is a count variable, and an offset would be useful. What would our offset be?
+]
+]
+
+--
+
+.large[
+* Example: We're interested in the number of births in US cities, but cities have very different populations. Offset: city population
+* Example: We're interested in the number of tree species in US forests, but forests have very different sizes. Offset: area of forest
+]
+
+---
+
+### Inference
+
+.large[
+$$\log(\lambda_i) = \beta_0 + \beta_1 MW_i + \beta_2 NE_i + \beta_3 SE_i + \beta_4 SW_i + \beta_5 W_i \\ + \log(Enrollment_i)$$
+
+Our concerned parent wants to know whether the crime rate on campuses is different in different regions. 
+
+.question[
+What hypotheses would we test to answer this question?
+]
+]
+
+--
+
+.large[
+$H_0: \beta_1 = \beta_2 = \beta_3 = \beta_4 = \beta_5 = 0$
+
+$H_A: \text{at least one of } \beta_1,...,\beta_5 \neq 0$
+
+.question[
+What test can we use?
+]
+]
+
+---
+
+### Likelihood ratio test
+
+.large[
+Full model:
+
+$$\log(\lambda_i) = \beta_0 + \beta_1 MW_i + \beta_2 NE_i + \beta_3 SE_i + \beta_4 SW_i + \beta_5 W_i \\ + \log(Enrollment_i)$$
+
+Reduced model:
+
+$$\log(\lambda_i) = \beta_0 + \log(Enrollment_i)$$
+]
+
+---
+
+### Likelihood ratio test
+
+.large[
+```{r, output.lines = 22:23}
+m2 <- glm(nv ~ region, offset = log(enroll1000),
+          data = crimes, family = poisson)
+summary(m2)
+```
+
+.question[
+What is my test statistic?
+]
+]
+
+--
+
+.large[
+$G = 491 - 433.14 = 57.86$
+
+.question[
+How do I calculate a p-value?
+]
+]
+
+---
+
+### Likelihood ratio test
+
+.large[
+```{r, output.lines = 22:23}
+m2 <- glm(nv ~ region, offset = log(enroll1000),
+          data = crimes, family = poisson)
+summary(m2)
+```
+
+$G = 491 - 433.14 = 57.86$
+
+```{r}
+pchisq(57.86, df=5, lower.tail=F)
+```
+]
+
+---
+
+### Confidence interval
+
+.large[
+$$\log(\lambda_i) = \beta_0 + \beta_1 MW_i + \beta_2 NE_i + \beta_3 SE_i + \beta_4 SW_i + \beta_5 W_i \\ + \log(Enrollment_i)$$
+
+Now our concerned parent is specifically interested in comparing crime rates between central and western schools. What confidence interval should we make?
+]
+
+--
+
+.large[
+A confidence interval for $\exp\{\beta_5\}$ (the change in crime rates between central and western schools)
+]
+
+---
+
+### Confidence interval
+
+.large[
+```{r, echo=F, output.lines = 10:16}
+m2 <- glm(nv ~ region, offset = log(enroll1000),
+          data = crimes, family = poisson)
+summary(m2)
+```
+
+95% confidence interval for $\beta_5$:
+
+$0.21 \pm 1.96 \cdot 0.186 = (-0.155, \ 0.575)$
+
+95% confidence interval for $\exp\{\beta_5\}$:
+
+$(e^{-0.155}, e^{0.575}) = (0.856, \ 1.777)$
+]
+
+---
+
+### Confidence interval
+
+.large[
+$$\log(\lambda_i) = \beta_0 + \beta_1 MW_i + \beta_2 NE_i + \beta_3 SE_i + \beta_4 SW_i + \beta_5 W_i \\ + \log(Enrollment_i)$$
+
+95% confidence interval for $\exp\{\beta_5\}$:
+
+$(e^{-0.155}, e^{0.575}) = (0.856, \ 1.777)$
+
+.question[
+How would we interpret this confidence interval?
+]
+]
+
+--
+
+.large[
+We are 95% confident that the crime rate for schools in the western region is between 0.856 and 1.777 times higher than for schools in the central region.
+]
