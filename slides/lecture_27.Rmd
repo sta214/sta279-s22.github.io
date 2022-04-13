@@ -14,6 +14,12 @@ editor_options:
 
 ### Agenda
 
+.large[
+* No class on Friday
+* No HW due this week
+* Today: continuing Poisson regression
+]
+
 ---
 
 ### Data
@@ -91,7 +97,11 @@ $$\log(\lambda_i) = \beta_0 + \beta_1 MW_i + \beta_2 NE_i + \beta_3 SE_i + \beta
 
 ---
 
-### Class activity, Part I
+### Class activity
+
+.large[
+[https://sta279-s22.github.io/class_activities/ca_lecture_27.html](https://sta279-s22.github.io/class_activities/ca_lecture_27.html)
+]
 
 ---
 
