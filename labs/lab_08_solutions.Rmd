@@ -1,0 +1,148 @@
+---
+title: "Lab 8 Solutions"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(pbkrtest)
+music <- read_csv("https://sta279-s22.github.io/labs/music.csv")
+```
+
+### Question 1 (4 pts)
+
+$H_0: \beta_4 = 0 \hspace{1cm} H_A: \beta_4 \neq 0$
+
+Reduced model:
+
+$$Anxiety_{ij} = \beta_0 + \beta_1 \ JuriedPerformance_{ij} + \beta_2 \ PublicPerformance_{ij} \\ \hspace{1cm} + \ \beta_3 \ StudentPerformance_{ij} + u_i + \varepsilon_{ij}$$
+$u_i \overset{iid}{\sim} N(0, \sigma_u^2)$, $\varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$
+
+**Grading:** 2 pts for hypotheses, 2 pts for reduced model. Lose 1 pt for incorrect notation (e.g., missing subscripts, or missing distribution of random effect and noise)
+
+### Question 2 (2 pts)
+
+```{r}
+m1 <- lmer(na ~ audience + large + (1|id), data = music)
+m0 <- lmer(na ~ audience + (1|id), data = music)
+
+summary(m0)
+```
+
+For the reduced model, $\widehat{\sigma}_u^2 = 5.60$, $\widehat{\sigma}_\varepsilon^2 = 20.85$
+
+### Question 3 (2 pts)
+
+```{r}
+KRmodcomp(m1, m0)$stats$Fstat
+```
+
+Our test statistic on the observed data is $F = 11.63$
+
+### Question 4 (3 pts)
+
+```{r}
+re_new <- rnorm(n = 37, mean = 0, sd = sqrt(5.60))
+```
+
+**Grading:** 1 pt each for `n`, `mean`, and `sd`
+
+
+### Question 5 (3 pts)
+
+```{r}
+noise_new <- rnorm(n = 497, mean = 0, sd = sqrt(20.85))
+```
+
+**Grading:** 1 pt each for `n`, `mean`, and `sd`
+
+### Question 6 (2 pts)
+
+```{r}
+fitted_values <- predict(m0, re.form=NA)
+
+re_data <- data.frame(id = unique(music$id),
+                      re = re_new) %>%
+  right_join(dplyr::select(music, id), by = "id")
+
+new_data <- data.frame(id = music$id,
+                       audience = music$audience,
+                       large = music$large,
+                       na = fitted_values + re_data$re + noise_new)
+
+m1_sim <- lmer(na ~ audience + large + (1|id), data = new_data)
+m0_sim <- lmer(na ~ audience + (1|id), data = new_data)
+```
+
+**Grading:** They need to fit the full and reduced models on the new simulated data. 1 pt for the full and 1 pt for the reduced model
+
+### Question 7 (2 pts)
+
+```{r}
+KRmodcomp(m1_sim, m0_sim)$stats$Fstat
+```
+
+**Grading:** They need to use the models fit on the simulated data here
+
+### Question 8 (5 pts)
+
+```{r}
+nsim <- 500
+f_stats <- rep(NA, nsim)
+
+for(sim in 1:nsim){
+  re_new <- rnorm(n = 37, mean = 0, sd = sqrt(5.60))
+  noise_new <- rnorm(n = 497, mean = 0, sd = sqrt(20.85))
+  
+  fitted_values <- predict(m0, re.form=NA)
+
+  re_data <- data.frame(id = unique(music$id),
+                        re = re_new) %>%
+    right_join(dplyr::select(music, id), by = "id")
+  
+  new_data <- data.frame(id = music$id,
+                         audience = music$audience,
+                         large = music$large,
+                         na = fitted_values + re_data$re + noise_new)
+  
+  m1_sim <- lmer(na ~ audience + large + (1|id), data = new_data)
+  m0_sim <- lmer(na ~ audience + (1|id), data = new_data)
+  
+  f_stats[sim] <- KRmodcomp(m1_sim, m0_sim)$stats$Fstat
+  
+}
+```
+
+**Grading:** They need to have *each* step inside the for loop (1 pt for each)
+
+* generating new noise
+* generating new random effects
+* combining them to create new data
+* fitting the models on simulated data
+* calculating and saving the test statistic
+
+### Question 9 (2 pts)
+
+```{r}
+mean(f_stats > 11.63)
+```
+
+There is strong evidence for a difference in anxiety levels between large and small ensemble performances, after accounting for audience type.
+
+### Question 10 (2 pts)
+
+It is roughly similar, but not exactly the same. In part this is because the a p-value of 0.0007 could not be observed with just 500 repetitions (see Q 11).
+
+
+### Question 11 (2 pts)
+
+The bootstrap p-value is the proportion of simulations with a test statistic greater than what we observed in the data. This means that with 500 repetitions, our bootstrap p-value can take values 0, 0.002, 0.004, ..., 0.998, 1. We can get more detailed p-values if we use a larger number of bootstrap samples.
+
+
+
+
+
+
