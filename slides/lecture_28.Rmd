@@ -14,6 +14,13 @@ editor_options:
 
 ### Agenda
 
+.large[
+* Project 2 due next Monday
+* Today:
+  * Confidence intervals
+  * Overdispersion
+]
+
 ---
 
 ### Data
@@ -401,3 +408,46 @@ summary(m2)
 
 ### Class activity
 
+.large[
+[https://sta279-s22.github.io/class_activities/ca_lecture_28.html](https://sta279-s22.github.io/class_activities/ca_lecture_28.html)
+]
+
+---
+
+### Class activity
+
+.large[
+```{r echo=F, message=F, warning=F, output.lines=10:17}
+crimes <- read_csv("~/Documents/Teaching/sta279-s22.github.io/slides/c_data.csv")
+
+m2 <- glm(nv ~ region, offset = log(enroll1000),
+          data = crimes, family = quasipoisson)
+summary(m2)
+```
+
+.question[
+What confidence interval should I calculate to compare western and central schools?
+]
+]
+
+---
+
+### Class activity
+
+.large[
+```{r echo=F, message=F, warning=F, output.lines=10:17}
+crimes <- read_csv("~/Documents/Teaching/sta279-s22.github.io/slides/c_data.csv")
+
+m2 <- glm(nv ~ region, offset = log(enroll1000),
+          data = crimes, family = quasipoisson)
+summary(m2)
+```
+
+95% confidence interval for $\beta_5$: 
+
+$0.209 \pm 1.96 \cdot 0.512 = (-0.795, \ 1.213)$
+
+95% confidence interval for $e^{\beta_5}$:
+
+$(e^{-0.795}, e^{1.213}) = (0.452, \ 3.364)$
+]

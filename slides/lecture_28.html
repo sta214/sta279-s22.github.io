@@ -17,6 +17,13 @@ class: center, middle, inverse, title-slide
 
 ### Agenda
 
+.large[
+* Project 2 due next Monday
+* Today:
+  * Confidence intervals
+  * Overdispersion
+]
+
 ---
 
 ### Data
@@ -440,6 +447,66 @@ m2 &lt;- glm(art ~ ., data = articles,
 ## kid5        -0.184883   0.054268  -3.407 0.000686 ***
 ...
 ```
+]
+
+---
+
+### Class activity
+
+.large[
+[https://sta279-s22.github.io/class_activities/ca_lecture_28.html](https://sta279-s22.github.io/class_activities/ca_lecture_28.html)
+]
+
+---
+
+### Class activity
+
+.large[
+
+```
+...
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -1.30445    0.34161  -3.818 0.000274 ***
+## regionMW     0.09754    0.48893   0.199 0.842417    
+## regionNE     0.76268    0.42117   1.811 0.074167 .  
+## regionSE     0.87237    0.42175   2.068 0.042044 *  
+## regionSW     0.50708    0.50973   0.995 0.323027    
+## regionW      0.20934    0.51242   0.409 0.684055    
+...
+```
+
+.question[
+What confidence interval should I calculate to compare western and central schools?
+]
+]
+
+---
+
+### Class activity
+
+.large[
+
+```
+...
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -1.30445    0.34161  -3.818 0.000274 ***
+## regionMW     0.09754    0.48893   0.199 0.842417    
+## regionNE     0.76268    0.42117   1.811 0.074167 .  
+## regionSE     0.87237    0.42175   2.068 0.042044 *  
+## regionSW     0.50708    0.50973   0.995 0.323027    
+## regionW      0.20934    0.51242   0.409 0.684055    
+...
+```
+
+95% confidence interval for `\(\beta_5\)`: 
+
+`\(0.209 \pm 1.96 \cdot 0.512 = (-0.795, \ 1.213)\)`
+
+95% confidence interval for `\(e^{\beta_5}\)`:
+
+`\((e^{-0.795}, e^{1.213}) = (0.452, \ 3.364)\)`
 ]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
