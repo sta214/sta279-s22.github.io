@@ -1,0 +1,267 @@
+---
+title: "Lab 9 (Optional)"
+output: 
+  rmdformats::robobook:
+    css: "homework.css"
+    highlight: pygments
+link-citations: yes
+---
+
+**Due:** Friday, April 29, 12:00pm (noon) on Canvas
+
+* **Note:** This lab is *optional*. If you choose to submit Lab 9, your grade can replace a lower grade on a previous lab or homework assignment.
+
+A template R Markdown file is provided: [lab_09_template.Rmd](https://sta279-s22.github.io/labs/lab_09_template.Rmd)
+
+When you are done with the lab, submit your knitted HTML file to Canvas.
+
+# Data
+
+In this lab, you will look at the relationship between temperature, air pollution, and deaths in Chicago, between January 1, 1987 and December 31, 2000. There are 5114 rows in the data, with each row representing one day in that time period. Variables include:
+
+* `death`: totals deaths on that day
+* `pm10median`: the median density over the city of large pollutant particles
+* `pm25median`: the median density of smaller pollutant particles
+* `o3median`: median concentration of ozone
+* `so2median`: median concentration of sulphur dioxide
+* `time`: time in days (since the beginning of the study)
+* `tmpd`: average temperature that day (Fahrenheit)
+
+
+### Downloading the data
+
+First, install the `gamair` package in R. Then run the following, which will load the `chicago` dataset.
+
+```r
+library(gamair)
+data("chicago")
+```
+
+# Poisson regression
+
+In this lab, you will use Poisson regression to study the number of deaths, and the relationship between the number of deaths and temperature and pollution levels. We will begin with exploratory data analysis, then fit a Poisson regression model and adjust for overdispersion.
+
+## Exploratory data analysis
+
+We will begin by looking at the relationship between temperature and deaths. We would like to fit a Poisson regression model, with the number of deaths on each day as the response, since the number of deaths is a count variable. Recall that our Poisson regression model makes the following assumptions:
+
+* Poisson distribution (the response can be modeled by a Poisson distribution)
+* Independence (the observations are independent)
+* Shape (the shape of our regression model is correct)
+
+The independence assumption is probably violated, since we have time series data here (i.e., observations observed sequentially over time). We'll ignore that issue in this lab, since there isn't anything we can do about it in this class. We'll focus on the Poisson and shape assumptions.
+
+:::{.question}
+#### Question 1
+
+Create a histogram showing the distribution of the number of deaths. Do you think it is reasonable to use a Poisson distribution for this response?
+:::
+
+:::{.question}
+#### Question 2
+
+For a Poisson variable, the mean and variance are the same. Calculate the mean and variance of the number of deaths. Is it reasonable to assume that the mean and variance are the same?
+:::
+
+*(We will handle overdispersion shortly)*
+
+Now we would like to examine the relationship between daily temperature and the average number of deaths. Therefore, we need to explore whether this relationship is linear, or whether we need to fit a different model. In logistic regression we used empirical log odds plots, and in multinomial regression we used empirical log relative risk plots. For Poisson regression, we use empirical log mean plots, which are similar. We:
+
+* Divide the data into bins, using the predictor
+* Calculate the average response in each bin
+* Plot the log average response against the predictor
+
+Here is a function to make one of these plots. It works the same as the `logodds_plot` function for logistic regression, but the response is a count variable instead of a binary variable.
+
+```{r eval=F}
+logmean_plot <- function(data, num_bins, bin_method,
+                         x, y, grouping = NULL, reg_formula = y ~ x){
+  
+  if(is.null(grouping)){
+    dat <- data.frame(x = data[,x], 
+                      y = data[,y],
+                      group = 1)
+  } else {
+    dat <- data.frame(x = data[,x], 
+                      y = data[,y],
+                      group = data[,grouping])
+  }
+  
+  if(bin_method == "equal_size"){
+    log_table <- dat %>%
+      drop_na() %>%
+      arrange(group, x) %>%
+      group_by(group) %>%
+      mutate(obs = y,
+             bin = rep(1:num_bins,
+                       each=ceiling(n()/num_bins))[1:n()]) %>%
+      group_by(bin, group) %>%
+      summarize(mean_x = mean(x),
+                mean_y = mean(obs),
+                num_obs = n()) %>%
+      ungroup() %>%
+      mutate(log_mean = log(mean_y))
+  } else {
+    log_table <- dat %>%
+      drop_na() %>%
+      group_by(group) %>%
+      mutate(obs = y,
+             bin = cut(x, 
+                       breaks = num_bins,
+                       labels = F)) %>%
+      group_by(bin, group) %>%
+      summarize(mean_x = mean(x),
+                mean_y = mean(obs),
+                num_obs = n()) %>%
+      ungroup() %>%
+      mutate(log_mean = log(mean_y))
+  }
+  
+  if(is.null(grouping)){
+    log_table %>%
+      ggplot(aes(x = mean_x,
+                 y = log_mean)) +
+      geom_point(size=2.5) +
+      geom_smooth(se=F, method="lm", formula = reg_formula) +
+      theme_bw() +
+      labs(x = x,
+           y = "Empirical log mean count") +
+      theme(text = element_text(size=25))
+  } else {
+    log_table %>%
+      ggplot(aes(x = mean_x,
+                 y = log_mean,
+                 color = group,
+                 shape = group)) +
+      geom_point(size=2.5) +
+      geom_smooth(se=F, method="lm", formula = reg_formula) +
+      theme_bw() +
+      labs(x = x,
+           y = "Empirical log mean count",
+           color = grouping,
+           shape = grouping) +
+      theme(text = element_text(size=25))
+  }
+  
+}
+```
+
+:::{.question}
+#### Question 3
+
+Create an empirical log mean plot for the relationship between temperature and deaths. Does a linear function of temperature seem reasonable, or does it look like we need a transformation of temperature?
+:::
+
+## Modeling
+
+Now we want to fit a Poisson regression model. 
+
+:::{.question}
+#### Question 4
+
+Should we include an offset in our model? Explain your reasoning. If so, what should our offset be, and is this information available in the data?
+:::
+
+:::{.question}
+#### Question 5
+
+Based on your answers to questions 3 and 4, write down a population Poisson regression model for the relationship between temperature and deaths, which can be fit using the `chicago` data. 
+:::
+
+:::{.question}
+#### Question 6
+
+Fit your model in R, and report the equation of the fitted model. What is the estimated change in the number of deaths for a one degree increase in temperature?
+:::
+
+## Diagnostic tests
+
+To check whether our Poisson regression model is reasonable, there are two different tests we can perform. First, we can perform a goodness-of-fit test using the residual deviance for the fitted model. Next, we can perform a test for overdispersion.
+
+### Goodness-of-fit
+
+If our model from question 5 is a good fit to the data, then the residual deviance should follow a $\chi^2$ distribution, where the degrees of freedom are the same as the degrees of freedom for the residual deviance. 
+
+:::{.question}
+#### Question 7
+
+Calculate a p-value for the residual deviance from question 6, using the appropriate $\chi^2$ distribution. Does it look like our model is a good fit to the data?
+:::
+
+There are several reasons why our model might not be a good fit, including overdispersion and the need to add additional covariates. We will consider each of these in the remainder of the lab.
+
+### Overdispersion test
+
+The Poisson distribution assumes that the mean and variance of the response are the same, but this isn't always the case. We can compare the mean and variance with the *dispersion parameter* $\phi = \dfrac{\text{Variance}}{\text{Mean}}$. If $\phi > 1$, our data is *overdispersed* (i.e., the variance is higher than it should be).
+
+One way to check for overdispersion is to test the hypotheses
+
+$H_0: \phi = 1 \hspace{1cm} H_A: \phi > 1$
+
+While we haven't talked about the specifics of how this test works, we can perform the test using the `dispersiontest` function in the `AER` package (you may need to install the `AER` package).
+
+:::{.question}
+#### Question 8
+
+Use the `dispersiontest` function to test for overdispersion. Does it seem like there is overdispersion in our data?
+:::
+
+## Handling overdispersion
+
+We have discussed two ways of handling overdispersion in our data: fitting a quasi-Poisson model that estimates $\phi$ and adjusts the standard errors accordingly, and using a Negative Binomial distribution instead of a Poisson distribution. **(Note: the goodness-of-fit test we used for Poisson regression is not suitable for either the quasi-Poisson or the negative binomial models)**
+
+### Quasi-Poisson model
+
+:::{.question}
+#### Question 9
+
+Fit a quasi-Poisson model, and report the estimated dispersion parameter $\widehat{\phi}$. What is the relationship between the standard errors for the quasi-Poisson fit and the standard errors for the Poisson fit in question 6?
+:::
+
+### Negative Binomial
+
+:::{.question}
+#### Question 10
+
+Fill in the following code to fit a negative binomial regression model (note that because we use the `glm.nb` function, we don't need to specify a `family` in the function call):
+
+```r
+library(MASS)
+m_nb <- glm.nb(... ~ ..., data = chicago)
+summary(m_nb)
+```
+
+What is the estimated value of $\theta$ (the parameter controlling dispersion in the negative binomial model)?
+:::
+
+## Inference
+
+Details on choosing a quasi-Poisson vs. a negative binomial regression model are beyond the scope of this course (I just want you to be familiar with both possible choices). If you want to learn more, [here](https://digitalcommons.unl.edu/cgi/viewcontent.cgi?article=1141&context=usdeptcommercepub) is a link to an interesting paper comparing the two options.
+
+For this lab, you may pick either the quasi-Poisson or the negative binomial regression model. Our final step is to add pollution to our model.
+
+:::{.question}
+#### Question 11
+
+Add pollution to your model from either question 9 or question 10, and report the equation of your fitted model.
+:::
+
+:::{.question}
+#### Question 12
+
+Calculate a confidence interval for the change in the average number of deaths associated with a one degree increase in temperature, holding pollution constant.
+:::
+
+# Maximum Likelihood Estimation
+
+In the final part of this lab, you will practice with maximum likelihood estimation. We will look at the negative binomial distribution, which we have used to handle overdispersion.
+
+Recall that if $Y \sim NB(\theta, p)$, then $Y$ can take values $y = 0, 1, 2, 3, ...$, and
+
+$$P(Y = y) = \dfrac{(y + \theta - 1)!}{y!(\theta - 1)!} (1 - p)^\theta p^y$$
+
+:::{.question}
+#### Question 13
+
+Suppose that $\theta$ is known (so we don't need to estimate it), but $p$ is unknown. We observe a sample $Y_1, ..., Y_n$. Calculate the maximum likelihood estimate for $p$.
+:::
