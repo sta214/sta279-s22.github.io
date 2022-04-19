@@ -1,0 +1,285 @@
+---
+title: Overdispersion with Negative Binomial
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+### Agenda
+
+.large[
+* Project 2 due Monday 4/25
+* Today:
+  * Finish overdispersion
+  * Lab 9
+* Lab 9: Optional!
+  * Due Friday 4/29
+  * Can replace a lab or homework grade if you submit
+]
+
+---
+
+### Data
+
+```{r include=F}
+library(tidyverse)
+library(foreign)
+library(knitr)
+library(MASS)
+hook_output <- knit_hooks$get("output")
+knit_hooks$set(output = function(x, options) {
+   lines <- options$output.lines
+   if (is.null(lines)) {
+     return(hook_output(x, options))  # pass to default hook
+   }
+   x <- unlist(strsplit(x, "\n"))
+   more <- "..."
+   if (length(lines)==1) {        # first n lines
+     if (length(x) > lines) {
+       # truncate the output, but add ....
+       x <- c(head(x, lines), more)
+     }
+   } else {
+     x <- c(more, x[lines], more)
+   }
+   # paste these lines together
+   x <- paste(c(x, ""), collapse = "\n")
+   hook_output(x, options)
+ })
+
+articles <- read.dta("http://www.stata-press.com/data/lf2/couart2.dta")
+
+```
+
+.large[
+We are interested in analyzing the number of articles published by biochemistry PhD students. The data contains the following variables:
+
+* `art`: articles published in last three years of Ph.D.
+* `fem`: gender (recorded as male or female)
+* `mar`: marital status (recorded as married or single)
+* `kid5`: number of children under age six
+* `phd`: prestige of Ph.D. program
+* `ment`: articles published by their mentor in last three years
+
+$$Articles_i \sim Poisson(\lambda_i)$$
+$$\log(\lambda_i) = \beta_0 + \beta_1 Female_i + \beta_2 Married_i + \beta_3 Kids_i + \\  \beta_4 Prestige_i + \beta_5 Mentor_i$$
+]
+
+---
+
+### Recap: Overdispersion
+
+.large[
+**Overdispersion** occurs when the response $Y$ has higher variance than we would expect if $Y$ followed a Poisson distribution.
+
+Overdispersion is a problem because our standard errors (for confidence intervals and hypothesis tests) are too low. Options:
+
+* Option 1: Fit a quasi-Poisson model to estimate dispersion parameter $\phi$ and adjust the standard errors
+* Option 2: Use a different distribution for the response
+]
+
+---
+
+### Recap: quasi-Poisson
+
+.large[
+```{r, message=F, warning=F}
+m2 <- glm(art ~ ., data = articles, 
+          family = quasipoisson)
+```
+]
+
+```{r echo=F, output.lines = 10:20}
+summary(m2)
+```
+
+.large[
+$\widehat{\phi} = 1.829$
+]
+
+---
+
+### Recap: quasi-Poisson
+
+.large[
+**Poisson:**
+
+```{r echo=F, output.lines = 10:14}
+m1 <- glm(art ~ ., data = articles, 
+          family = poisson)
+summary(m1)
+```
+
+**Quasi-Poisson:**
+
+```{r echo=F, output.lines = 10:14}
+summary(m2)
+```
+]
+
+---
+
+### Comparing Poisson and quasi-Poisson
+
+.large[
+**Poisson:**
+
+* Mean = $\lambda_i$
+* Variance = $\lambda_i$
+
+**quasi-Poisson:**
+
+* Mean = $\lambda_i$
+* Variance = $\phi \lambda_i$
+* Variance is a linear function of the mean
+
+.question[
+What if we want variance to depend on the mean in a different way?
+]
+]
+
+---
+
+### Introducing the negative binomial
+
+.large[
+If $Y_i \sim NB(\theta, p)$, then $Y_i$ takes values $y = 0, 1, 2, 3, ...$ with probabilities
+
+$$P(Y_i = y) = \dfrac{(y + \theta - 1)!}{y!(\theta - 1)!} (1 - p)^\theta p^y$$
+
+* $\theta > 0$, $\ \ \ p \in [0, 1]$
+* Mean = $\dfrac{p \theta}{1 - p} = \mu$
+* Variance = $\dfrac{p \theta}{(1 - p)^2} = \mu + \dfrac{\mu^2}{\theta}$
+* Variance is a *quadratic* function of the mean
+]
+
+---
+
+### Mean and variance for a negative binomial variable
+
+.large[
+If $Y_i \sim NB(\theta, p)$, then
+
+* Mean = $\dfrac{p \theta}{1 - p} = \mu$
+* Variance = $\dfrac{p \theta}{(1 - p)^2} = \mu + \dfrac{\mu^2}{\theta}$
+
+.question[
+How is $\theta$ related to overdispersion?
+]
+]
+
+--
+
+.large[
+* If $\theta$ is small, then $\text{variance} > > \text{mean}$
+* If $\theta$ is large, then $\text{variance} \approx \text{mean}$
+]
+
+---
+
+### Negative binomial regression
+
+.large[
+$$Y_i \sim NB(\theta, \ p_i)$$
+
+$$\log(\mu_i) = \beta_0 + \beta_1 X_i$$
+
+* $\mu_i = \dfrac{p_i \theta}{1 - p_i}$
+* Note that $\theta$ is the same for all $i$
+* Note that just like in Poisson regression, we model the average count
+  * Interpretation of $\beta$s is the same as in Poisson regression
+]
+
+---
+
+### Comparing Poisson, quasi-Poisson, negative binomial
+
+.large[
+**Poisson:**
+
+* Mean = $\lambda_i$
+* Variance = $\lambda_i$
+
+**quasi-Poisson:**
+
+* Mean = $\lambda_i$
+* Variance = $\phi \lambda_i$
+
+**negative binomial:**
+
+* Mean = $\mu_i$
+* Variance = $\mu_i + \dfrac{\mu_i}{\theta}$
+]
+
+---
+
+### In R
+
+.large[
+```{r message=F}
+m3 <- glm.nb(art ~ ., data = articles)
+```
+
+```{r echo=F, output.lines = 11:21}
+summary(m3)
+```
+
+$\widehat{\theta} = 2.264$
+]
+
+---
+
+### In R
+
+.large[
+```{r echo=F, output.lines = 11:17}
+summary(m3)
+```
+
+.question[
+How do I interpret the estimated coefficient -0.176?
+]
+]
+
+--
+
+.large[
+An additional child under the age of 6 is associated with a decrease in the average number of articles published by a factor of $\exp\{-0.176\} = 0.839$
+]
+
+
+---
+
+### quasi-Poisson vs. negative binomial
+
+.large[
+
+.pull-left[
+**quasi-Poisson:**
+
+* linear relationship between mean and variance
+* easy to interpret $\widehat{\phi}$
+* same as Poisson regression when $\phi = 1$
+* simple adjustment to estimated standard errors
+* estimated coefficients same as in Poisson regression
+]
+
+.pull-right[
+**negative binomial:**
+
+* quadratic relationship between mean and variance
+* we get to use a likelihood, rather than a quasi-likelihood
+* Same as Poisson regression when $\theta$ is very large and $p$ is very small
+]
+
+.question[
+For this class, either is appropriate to handle overdispersion.
+]
+]
