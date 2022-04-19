@@ -16,6 +16,7 @@ editor_options:
 
 .large[
 * Project 2 due Monday 4/25
+* Friday: project work day
 * Today:
   * Finish overdispersion
   * Lab 9
