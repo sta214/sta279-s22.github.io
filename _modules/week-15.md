@@ -9,7 +9,13 @@ April 18
 : Textbook Chapter 4
 
 April 20
-: Handling overdispersion
+: Overdispersion with negative binomial regression
+  : [Slides](https://sta279-s22.github.io/slides/lecture_29.html)
+  
+: Textbook Chapter 4
+
+: **Lab 9 (optional)**{: .label .label-purple }
+  : [Lab 9](https://sta279-s22.github.io/labs/lab_9.html)
 
 April 22
-: **Lab 9**{: .label .label-purple }
+: Work day

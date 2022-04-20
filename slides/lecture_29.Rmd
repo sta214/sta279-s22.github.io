@@ -216,7 +216,7 @@ $$\log(\mu_i) = \beta_0 + \beta_1 X_i$$
 **negative binomial:**
 
 * Mean = $\mu_i$
-* Variance = $\mu_i + \dfrac{\mu_i}{\theta}$
+* Variance = $\mu_i + \dfrac{\mu_i^2}{\theta}$
 ]
 
 ---
