@@ -14,6 +14,14 @@ editor_options:
 
 ### Agenda
 
+.large[
+* Final exam on May 3
+  * Friday: review day for final
+  * Final exam practice questions on course website
+* Today: zero inflated Poisson (ZIP) models
+  * Not required for final, but may appear as a bonus question
+]
+
 ---
 
 ### Data: College drinking
