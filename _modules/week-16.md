@@ -13,6 +13,7 @@ April 25
 
 April 27
 : Wrap up, work day
+  : [Slides](https://sta279-s22.github.io/slides/lecture_31.html)
 
 April 29
 : Final exam review day
