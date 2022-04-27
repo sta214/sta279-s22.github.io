@@ -7,7 +7,7 @@ April 25
   : [Slides](https://sta279-s22.github.io/slides/lecture_30.html)
 
 : Final exam review questions
-  : [Review](https://sta279-s22.github.io/class_activities/final_exam_review.pdf)
+  : [Review](https://sta279-s22.github.io/class_activities/final_exam_review.pdf), [Solutions](https://sta279-s22.github.io/class_activities/final_exam_review_solutions.pdf)
 
 : **Project 2 due**{: .label .label-red }
 
