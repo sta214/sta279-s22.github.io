@@ -7,7 +7,7 @@ April 25
   : [Slides](https://sta279-s22.github.io/slides/lecture_30.html)
 
 : Final exam review questions
-  : [Review](https://sta279-s22.github.io/class_activities/final_exam_review.pdf), [Solutions](https://sta279-s22.github.io/class_activities/final_exam_review_solutions.pdf)
+  : [Review](https://sta279-s22.github.io/class_activities/final_exam_review.pdf), [Solutions](https://sta279-s22.github.io/class_activities/final-exam-review-solutions.pdf)
 
 : **Project 2 due**{: .label .label-red }
 
@@ -17,6 +17,7 @@ April 27
 
 April 29
 : Final exam review day
+  : [Notes](https://sta279-s22.github.io/class_activities/review-day-notes.pdf)
 
 : Final exam time is May 3, 2pm
 
